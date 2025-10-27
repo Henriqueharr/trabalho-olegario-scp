@@ -9,8 +9,10 @@
 void transicao1(WINDOW * tela, short yi, short yf)
 {
    curs_set(FALSE);
-   int maxy = getmaxy(tela);
+   unsigned short x, y;
+   getyx(tela, y, x);
    for(short i = yi; i <= yf; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(25);};
+   wmove(tela, y, x);
    curs_set(TRUE);
 }
 

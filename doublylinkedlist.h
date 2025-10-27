@@ -3,6 +3,8 @@
 
 typedef enum Tipos {PESSOA_FISICA = 1, PESSOA_JURIDICA, PEDIDO, PRODUTO, ITEM_PEDIDO} Tipos;
 
+#define get_content(node,type) ((type*)(node->content))
+
 typedef struct Node 
 {
    void *content;

@@ -30,8 +30,8 @@ int main()
       showMainMenu(&opc);
 
       //testando função
-      size_t a;
-      lerSizeT(&a, stdscr);
+      // size_t a;
+      // lerSizeT(&a, stdscr);
       
       transicao1(stdscr, 0, maxstdy);
 

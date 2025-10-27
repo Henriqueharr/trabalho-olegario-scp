@@ -32,6 +32,13 @@ typedef enum MenuPedido {ADD_PEDIDO = 1,
                          CARREGAR_PEDIDOS_CSV, 
                          VOLTAR_PEDIDO} MenuPedido;
 
+typedef enum MenuCriarCliente{ID = 1,
+                              NOME,
+                              ENDERECO,
+                              TELEFONE,
+                              CPF_CNPJ,
+                              FINALIZAR} MenuCriarCliente;
+
 void transicao1(WINDOW * tela, short yi, short yf);
 void transicao2(WINDOW *tela, short yi, short yf, short pad);
 void showMainMenu(MenuPrincipal *opc);

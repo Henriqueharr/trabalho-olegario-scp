@@ -3,6 +3,8 @@
 
 #include "doublylinkedlist.h"
 
+#define get_ctype(void_ptr,type) ((type*)void_ptr)
+
 typedef struct Cliente
 {
    size_t id;
@@ -22,6 +24,11 @@ typedef struct PessoaJuridica
    Cliente data;
    char cnpj[20];
 } PessoaJuridica;
+
+typedef struct GenericCast
+{
+   Cliente data;
+} GenericCast;
 
 void* criarCliente(Tipos dataType);
 
