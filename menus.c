@@ -4,21 +4,40 @@
 #include "produtos.h"
 #include "pedidos.h"
 #include "menus.h"
+#include "doublylinkedlist.h"
 
-void transicao(WINDOW * tela)
+void transicao1(WINDOW * tela, short yi, short yf)
 {
+   curs_set(FALSE);
    int maxy = getmaxy(tela);
-   for(size_t i = 0; i < maxy; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(25);};
+   for(short i = yi; i <= yf; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(25);};
+   curs_set(TRUE);
+}
+
+void transicao2(WINDOW *tela, short yi, short yf, short pad)
+{
+   curs_set(FALSE);
+   for(short i = yi; i <= yf; i++)
+   {
+      wmove(tela, i, 0);
+      for(short j = 0; j < pad; j++)
+      {
+         wdelch(tela);
+         wrefresh(tela);
+         napms(5);
+      }
+   }
+   curs_set(TRUE);
 }
 
 void showMainMenu(MenuPrincipal *opc)
 {
-   wclear(stdscr);
+   werase(stdscr);
    
    curs_set(FALSE);
    noecho();
    cbreak();
-   mvwaddstr(stdscr, 0, 1, "Comandos:");
+   mvwaddstr(stdscr, 0, 1, "!Comandos!");
    mvwaddstr(stdscr, 2, 1, "Cima : Mover para cima");
    mvwaddstr(stdscr, 3, 1, "Baixo: Mover para baixo");
    mvwaddstr(stdscr, 4, 1, "Enter: Confirmar/Selecionar");
@@ -76,16 +95,17 @@ void showMainMenu(MenuPrincipal *opc)
    keypad(stdscr, FALSE);
    echo();
    nocbreak();
+   curs_set(TRUE);
 }
 
 void showCustomerMenu(MenuCliente *opc)
 {
-   wclear(stdscr);
+   werase(stdscr);
    
    curs_set(FALSE);
    noecho();
    cbreak();
-   mvwaddstr(stdscr, 0, 1, "Comandos:");
+   mvwaddstr(stdscr, 0, 1, "!Comandos!");
    mvwaddstr(stdscr, 2, 1, "Cima : Mover para cima");
    mvwaddstr(stdscr, 3, 1, "Baixo: Mover para baixo");
    mvwaddstr(stdscr, 4, 1, "Enter: Confirmar/Selecionar");
@@ -146,4 +166,59 @@ void showCustomerMenu(MenuCliente *opc)
    keypad(stdscr, FALSE);
    echo();
    nocbreak();
+   curs_set(TRUE);
+}
+
+void showAddCustomerMenu(Tipos *dataType)
+{
+   //75
+   curs_set(FALSE);
+   noecho();
+   cbreak();
+
+   mvwaddstr(stdscr, 21, 75, "Escolha o tipo de cliente:");
+   mvwaddstr(stdscr, 23, 78, "Pessoa física");
+   mvwaddstr(stdscr, 24, 78, "Pessoa jurídica");
+   mvwaddch(stdscr, 23, 75, '>');
+
+   wrefresh(stdscr);
+
+   short menuKey = KEY_UP;
+   short stdy = 23;
+   *dataType = PESSOA_FISICA;
+
+   keypad(stdscr, TRUE);
+
+   while(menuKey != '\n')
+   {
+      switch(menuKey)
+      {
+         case KEY_UP: 
+         if(stdy == 24)
+         {
+            mvwaddch(stdscr, stdy, 75, ' ');
+            stdy--;
+            mvwaddch(stdscr, stdy, 75, '>');
+            (*dataType)--;
+         }   
+         break;
+
+         case KEY_DOWN:
+         if(stdy == 23)
+         {
+            mvwaddch(stdscr, stdy, 75, ' ');
+            stdy++;
+            mvwaddch(stdscr, stdy, 75, '>');
+            (*dataType)++;
+         }
+         break;
+      }
+      wrefresh(stdscr);
+      menuKey = wgetch(stdscr);
+   }
+
+   keypad(stdscr, FALSE);
+   echo();
+   nocbreak();
+   curs_set(TRUE);
 }

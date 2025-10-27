@@ -8,16 +8,19 @@
 #include "clientes.h"
 #include "produtos.h"
 #include "pedidos.h"
+#include "safetyutils.h"
 
 int main()
 {
    setlocale(LC_ALL,"");
    initscr();
 
-   List listaClientes, listaPedidos, listaProdutos;
-   initList(&listaClientes);
-   initList(&listaPedidos);
-   initList(&listaProdutos);
+   short maxstdy, maxstdx;
+   getmaxyx(stdscr, maxstdy, maxstdx);
+   List LClientes, LPedidos, LProdutos;
+   initList(&LClientes);
+   initList(&LPedidos);
+   initList(&LProdutos);
    
    MenuPrincipal opc = MENU_CLIENTES;
    
@@ -25,8 +28,13 @@ int main()
    {
       
       showMainMenu(&opc);
+
+      //testando função
+      size_t a;
+      lerSizeT(&a, stdscr);
       
-      transicao(stdscr);
+      transicao1(stdscr, 0, maxstdy);
+
       
       switch(opc)
       {
@@ -37,12 +45,16 @@ int main()
             {
                showCustomerMenu(&escolha);
 
-               transicao(stdscr);
-
                switch(escolha)
                {
                   case ADD_CLIENTE:
-                  mvwaddstr(stdscr, 33, 95, "Adicionar clientes\n");
+                  {
+                     Tipos dataType;
+                     transicao1(stdscr, 27, maxstdy);
+                     transicao2(stdscr, 20, 25, 50);
+                     showAddCustomerMenu(&dataType);
+                     criarCliente(dataType);
+                  }
                   break;
                   case LISTAR_CLIENTES:
                   mvwaddstr(stdscr, 33, 95, "Listar clientes\n");
@@ -63,24 +75,23 @@ int main()
                   mvwaddstr(stdscr, 33, 95, "Saindo do menu de clientes\n");
                   break;
                }
-
-               wgetch(stdscr);
+               wrefresh(stdscr);
+               napms(500);
             }
          }
          break;
          case MENU_PRODUTOS:
          mvwaddstr(stdscr, 33, 95, "Produtos selecionados\n");
-         wgetch(stdscr);
          break;
          case MENU_PEDIDOS:
          mvwaddstr(stdscr, 33, 95, "Pedidos selecionados\n");
-         wgetch(stdscr);
          break;
          case ENCERRAR_PROGRAMA:
          mvwaddstr(stdscr, 33, 95, "Encerrando programa\n");
-         wgetch(stdscr);
          break;
       }
+      wrefresh(stdscr);
+      napms(500);
    }
 
 

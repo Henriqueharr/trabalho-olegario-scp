@@ -2,6 +2,7 @@
 #define MENU_UTILS_H
 
 #include <ncurses.h>
+#include "doublylinkedlist.h"
 
 typedef enum MenuPrincipal {MENU_CLIENTES = 1, 
                             MENU_PRODUTOS, 
@@ -31,8 +32,10 @@ typedef enum MenuPedido {ADD_PEDIDO = 1,
                          CARREGAR_PEDIDOS_CSV, 
                          VOLTAR_PEDIDO} MenuPedido;
 
-void transicao(WINDOW * tela);
+void transicao1(WINDOW * tela, short yi, short yf);
+void transicao2(WINDOW *tela, short yi, short yf, short pad);
 void showMainMenu(MenuPrincipal *opc);
 void showCustomerMenu(MenuCliente *opc);
+void showAddCustomerMenu(Tipos *dataType);
 
 #endif
