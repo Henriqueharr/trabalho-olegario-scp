@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include "doublylinkedlist.h"
+             
 
 void initList(List *lista)
 {
