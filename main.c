@@ -28,10 +28,6 @@ int main()
    {
       
       showMainMenu(&opc);
-
-      //testando função
-      // size_t a;
-      // lerSizeT(&a, stdscr);
       
       transicao1(stdscr, 0, maxstdy);
 
@@ -53,7 +49,8 @@ int main()
                      transicao1(stdscr, 27, maxstdy);
                      transicao2(stdscr, 20, 25, 50);
                      showAddCustomerMenu(&dataType);
-                     criarCliente(dataType);
+                     void *novoCliente = criarCliente(dataType);
+                     insertNode(&LClientes, novoCliente, dataType);
                   }
                   break;
                   case LISTAR_CLIENTES:

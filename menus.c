@@ -6,6 +6,19 @@
 #include "menus.h"
 #include "doublylinkedlist.h"
 
+void gerarErro(unsigned short altura, unsigned short largura, unsigned short xi, unsigned short yi, const char *bordas, const char *titulo, const char *msg)
+{
+   WINDOW *erro = newwin(altura, largura, xi, yi);
+   WINDOW *subtela = derwin(erro, altura - 2, largura - 2, 1, 1);
+   wborder(erro, bordas[0], bordas[1], bordas[2], bordas[3], bordas[4], bordas[5], bordas[6], bordas[7]);
+   mvwprintw(subtela, 0, 0, "%s\n\n%s\n\nPressione qualquer tecla para continuar", titulo, msg);
+   keypad(erro, FALSE);
+   wgetch(erro);
+   transicao1(erro, 0, altura);
+   delwin(subtela);
+   delwin(erro);
+}
+
 void transicao1(WINDOW * tela, short yi, short yf)
 {
    curs_set(FALSE);

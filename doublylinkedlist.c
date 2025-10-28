@@ -10,6 +10,7 @@ void initList(List *lista)
    lista->tam = 0;
 }
 
+//Essa função insere nós em listas
 void insertNode(List *lista, void *conteudo, Tipos dataType)
 {
    Node *novo = (Node*)malloc(sizeof(Node));

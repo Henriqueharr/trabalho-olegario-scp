@@ -45,6 +45,7 @@ void* criarCliente(Tipos dataType)
    unsigned short tudofeito = 0;
    unsigned short stdy = 9;
    mvwaddch(stdscr, stdy, 148, '>');
+   curs_set(FALSE);
    keypad(stdscr, TRUE);
    noecho();
    cbreak();
@@ -75,41 +76,143 @@ void* criarCliente(Tipos dataType)
          }
          break;
          case '\n':
+         echo();
+         nocbreak();
          switch(opc)
          {
             case ID:
             {
                transicao1(subtelas[opc - 1], 0, 3);
-               lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
+               wmove(subtelas[opc - 1], 1, 3);
+               short check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
+               while(check != 1)
+               {
+                  cbreak();
+                  noecho();
+                  curs_set(FALSE);
+                  if(check == 0) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+                  if(check == -1) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+                  if(check == -2) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+                  nocbreak();
+                  echo();
+                  curs_set(TRUE);
+                  werase(subtelas[opc - 1]);
+                  wrefresh(subtelas[opc - 1]);
+                  wmove(subtelas[opc - 1], 1, 3);
+                  check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
+               }
                booleans[opc - 1] = 1;
             }
             break;
             case NOME:
             {
                transicao1(subtelas[opc - 1], 0, 3);
-               lerStr(get_ctype(novoCliente,GenericCast)->data.name, sizeof(get_ctype(novoCliente,GenericCast)->data.name), subtelas[opc - 1]);
+               wmove(subtelas[opc - 1], 1, 3);
+               short check = lerStr(get_ctype(novoCliente,GenericCast)->data.name, sizeof(get_ctype(novoCliente,GenericCast)->data.name), subtelas[opc - 1]);
+               while(check != 1)
+               {
+                  cbreak();
+                  noecho();
+                  curs_set(FALSE);
+                  if(check == -1) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de formatação", "Este campo não aceita entradas vazias ou iniciadas com espaço");
+                  nocbreak();
+                  echo();
+                  curs_set(TRUE);
+                  werase(subtelas[opc - 1]);
+                  wrefresh(subtelas[opc - 1]);
+                  wmove(subtelas[opc - 1], 1, 3);
+                  check = lerStr(get_ctype(novoCliente,GenericCast)->data.name, sizeof(get_ctype(novoCliente,GenericCast)->data.name), subtelas[opc - 1]);
+               }
                booleans[opc - 1] = 1;
             }
             break;
             case ENDERECO:
             {
                transicao1(subtelas[opc - 1], 0, 3);
-               lerStr(get_ctype(novoCliente,GenericCast)->data.address, sizeof(get_ctype(novoCliente,GenericCast)->data.address), subtelas[opc - 1]);
+               wmove(subtelas[opc - 1], 1, 3);
+               short check = lerStr(get_ctype(novoCliente,GenericCast)->data.address, sizeof(get_ctype(novoCliente,GenericCast)->data.address), subtelas[opc - 1]);
+               while(check != 1)
+               {
+                  cbreak();
+                  noecho();
+                  curs_set(FALSE);
+                  if(check == -1) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de formatação", "Este campo não aceita entradas vazias ou iniciadas com espaço");                  werase(subtelas[opc - 1]);
+                  nocbreak();
+                  echo();
+                  curs_set(TRUE);
+                  wrefresh(subtelas[opc - 1]);
+                  wmove(subtelas[opc - 1], 1, 3);
+                  check = lerStr(get_ctype(novoCliente,GenericCast)->data.address, sizeof(get_ctype(novoCliente,GenericCast)->data.address), subtelas[opc - 1]);
+               }
                booleans[opc - 1] = 1;
             }
             break;
             case TELEFONE:
             {
                transicao1(subtelas[opc - 1], 0, 3);
-               lerStr(get_ctype(novoCliente,GenericCast)->data.phonenumber, sizeof(get_ctype(novoCliente,GenericCast)->data.phonenumber), subtelas[opc - 1]);
+               wmove(subtelas[opc - 1], 1, 3);
+               short check = lerStr(get_ctype(novoCliente,GenericCast)->data.phonenumber, sizeof(get_ctype(novoCliente,GenericCast)->data.phonenumber), subtelas[opc - 1]);
+               while(check != 1)
+               {
+                  cbreak();
+                  noecho();
+                  curs_set(FALSE);
+                  if(check == -1) gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de formatação", "Este campo não aceita entradas vazias ou iniciadas com espaço");
+                  nocbreak();
+                  echo();
+                  curs_set(TRUE);
+                  werase(subtelas[opc - 1]);
+                  wrefresh(subtelas[opc - 1]);
+                  wmove(subtelas[opc - 1], 1, 3);
+                  check = lerStr(get_ctype(novoCliente,GenericCast)->data.phonenumber, sizeof(get_ctype(novoCliente,GenericCast)->data.phonenumber), subtelas[opc - 1]);
+               }
                booleans[opc - 1] = 1;
             }
             break;
             case CPF_CNPJ:
             {
+               cbreak();
                transicao1(subtelas[opc - 1], 0, 3);
-               if(dataType == PESSOA_FISICA) lerStr(get_ctype(novoCliente,PessoaFisica)->cpf, sizeof(get_ctype(novoCliente,PessoaFisica)->cpf), subtelas[opc - 1]);
-               else lerStr(get_ctype(novoCliente,PessoaJuridica)->cnpj, sizeof(get_ctype(novoCliente,PessoaJuridica)->cnpj), subtelas[opc - 1]);
+               if(dataType == PESSOA_FISICA)
+               {
+                  wmove(subtelas[opc - 1], 1, 3);
+                  lerCPF(get_ctype(novoCliente,PessoaFisica)->cpf, subtelas[opc - 1]);
+                  while(!validar_cpf(get_ctype(novoCliente,PessoaFisica)->cpf))
+                  {
+                     cbreak();
+                     noecho();
+                     curs_set(FALSE);
+                     gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de validação", "O CPF digitado não é válido");
+                     nocbreak();
+                     echo();
+                     curs_set(TRUE);
+                     werase(subtelas[opc - 1]);
+                     wrefresh(subtelas[opc - 1]);
+                     wmove(subtelas[opc - 1], 1, 3);
+                     cbreak();
+                     lerCPF(get_ctype(novoCliente,PessoaFisica)->cpf, subtelas[opc - 1]);
+                  }
+               }
+               else
+               {
+                  wmove(subtelas[opc - 1], 1, 3);
+                  lerCPF(get_ctype(novoCliente,PessoaJuridica)->cnpj, subtelas[opc - 1]);
+                  while(!validar_cnpj(get_ctype(novoCliente,PessoaJuridica)->cnpj))
+                  {
+                     cbreak();
+                     noecho();
+                     curs_set(FALSE);
+                     gerarErro(10, 36, 1, 86, "||~~OOOO", "Erro de validação", "O CNPJ digitado não é válido");
+                     nocbreak();
+                     echo();
+                     curs_set(TRUE);
+                     werase(subtelas[opc - 1]);
+                     wrefresh(subtelas[opc - 1]);
+                     wmove(subtelas[opc - 1], 1, 3);
+                     cbreak();
+                     lerCNPJ(get_ctype(novoCliente,PessoaJuridica)->cnpj, subtelas[opc - 1]);
+                  }
+               }
                booleans[opc - 1] = 1;
             }
             break;
@@ -117,6 +220,8 @@ void* criarCliente(Tipos dataType)
             booleans[opc - 1] = 1;
             break;
          }
+         noecho();
+         cbreak();
          tudofeito = 1;
          for(unsigned short i = 0; i < 5; i++)
          {
@@ -147,6 +252,8 @@ void* criarCliente(Tipos dataType)
       delwin(telas[i]);
    }
 
+   transicao1(stdscr, 43, 45);
+
    return novoCliente;
 
    escape:
@@ -157,5 +264,8 @@ void* criarCliente(Tipos dataType)
       delwin(telas[i]);
    }
    free(novoCliente);
+
+   transicao1(stdscr, 43, 45);
+
    return NULL;
 }

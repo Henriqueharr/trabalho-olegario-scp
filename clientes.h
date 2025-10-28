@@ -16,7 +16,7 @@ typedef struct Cliente
 typedef struct PessoaFisica
 {
    Cliente data;
-   char cpf[20];
+   char cpf[15];
 } PessoaFisica;
 
 typedef struct PessoaJuridica
