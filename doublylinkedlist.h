@@ -1,12 +1,13 @@
 #ifndef LINKEDLIST_UTILS_H
 #define LINKEDLIST_UTILS_H
 
+//Tipos de dados pretendidos para armazenamento em listas da SCP
 typedef enum Tipos {PESSOA_FISICA = 1, PESSOA_JURIDICA, PEDIDO, PRODUTO, ITEM_PEDIDO, NULO} Tipos;
 
 #define get_content(node,type) ((type*)(node->content))
 
 //Essa é a estrutura de um nó para listas duplamente encadeadas
-//Use o macro get_content para acessar o conteúdo do nó
+//Use o macro get_content para acessar o conteúdo do nó rapidamente
 //
 // typedef struct Node 
 // {
@@ -23,6 +24,9 @@ typedef struct Node
    struct Node *prev;
 } Node;
 
+//Estrutura que guarda o início e o fim de uma lista, além da quantidade de nós
+//Para mais informações em nós, consultar Node
+//
 // typedef struct List
 // {
 //    size_t tam;
@@ -36,7 +40,11 @@ typedef struct List
    Node *tail;
 } List;
 
+//Inicializa a lista duplamente encadeada dada
 void initList(List *lista);
+
+//Cria e insere um nó numa lista duplamente encadeada dada
+//Para mais informações em nós, consultar Node
 void createInsertNode(List *lista, void *conteudo, Tipos dataType);
 
 #endif

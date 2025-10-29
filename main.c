@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
 #include <locale.h>
@@ -10,6 +9,7 @@
 #include "pedidos.h"
 #include "safetyutils.h"
 
+//Essa é a main :D
 int main()
 {
    setlocale(LC_ALL,"");

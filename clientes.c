@@ -5,7 +5,6 @@
 #include "menus.h"
 #include "safetyutils.h"
 
-
 void* criarCliente(Tipos dataType, List *lista)
 {
    const char* label[] = {"ID", "Nome", "Endereço", "Telefone", "CPF", "CNPJ"};

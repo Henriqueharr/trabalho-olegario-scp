@@ -19,7 +19,6 @@ void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi,
    delwin(erro);
 }
 
-//25
 void cortina(WINDOW * tela, short yi, short yf, unsigned short delay)
 {
    curs_set(FALSE);
@@ -30,8 +29,6 @@ void cortina(WINDOW * tela, short yi, short yf, unsigned short delay)
    curs_set(TRUE);
 }
 
-
-//5
 void slideLeft(WINDOW *tela, short yi, short yf, short pad, unsigned short delay)
 {
    curs_set(FALSE);
@@ -48,8 +45,6 @@ void slideLeft(WINDOW *tela, short yi, short yf, short pad, unsigned short delay
    curs_set(TRUE);
 }
 
-
-//25
 void abrir(WINDOW *tela, short uppery, short abertura, unsigned short delay)
 {
    curs_set(FALSE);
