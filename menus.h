@@ -39,9 +39,11 @@ typedef enum MenuCriarCliente{ID = 1,
                               CPF_CNPJ,
                               FINALIZAR} MenuCriarCliente;
 
-void gerarErro(unsigned short altura, unsigned short largura, unsigned short xi, unsigned short yi, const char *bordas, const char *titulo, const char *msg);
-void transicao1(WINDOW * tela, short yi, short yf);
-void transicao2(WINDOW *tela, short yi, short yf, short pad);
+void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg);
+void cortina(WINDOW * tela, short yi, short yf, unsigned short delay);
+void slideLeft(WINDOW *tela, short yi, short yf, short pad, unsigned short delay);
+void abrir(WINDOW *tela, short uppery, short abertura, unsigned short delay);
+void logo(unsigned short y, unsigned short x);
 void showMainMenu(MenuPrincipal *opc);
 void showCustomerMenu(MenuCliente *opc);
 void showAddCustomerMenu(Tipos *dataType);

@@ -6,30 +6,33 @@
 #include "menus.h"
 #include "doublylinkedlist.h"
 
-void gerarErro(unsigned short altura, unsigned short largura, unsigned short xi, unsigned short yi, const char *bordas, const char *titulo, const char *msg)
+void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg)
 {
-   WINDOW *erro = newwin(altura, largura, xi, yi);
+   WINDOW *erro = newwin(altura, largura, yi, xi);
    WINDOW *subtela = derwin(erro, altura - 2, largura - 2, 1, 1);
    wborder(erro, bordas[0], bordas[1], bordas[2], bordas[3], bordas[4], bordas[5], bordas[6], bordas[7]);
    mvwprintw(subtela, 0, 0, "%s\n\n%s\n\nPressione qualquer tecla para continuar", titulo, msg);
    keypad(erro, FALSE);
    wgetch(erro);
-   transicao1(erro, 0, altura);
+   cortina(erro, 0, altura, 25);
    delwin(subtela);
    delwin(erro);
 }
 
-void transicao1(WINDOW * tela, short yi, short yf)
+//25
+void cortina(WINDOW * tela, short yi, short yf, unsigned short delay)
 {
    curs_set(FALSE);
    unsigned short x, y;
    getyx(tela, y, x);
-   for(short i = yi; i <= yf; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(25);};
+   for(short i = yi; i <= yf; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(delay);};
    wmove(tela, y, x);
    curs_set(TRUE);
 }
 
-void transicao2(WINDOW *tela, short yi, short yf, short pad)
+
+//5
+void slideLeft(WINDOW *tela, short yi, short yf, short pad, unsigned short delay)
 {
    curs_set(FALSE);
    for(short i = yi; i <= yf; i++)
@@ -39,10 +42,39 @@ void transicao2(WINDOW *tela, short yi, short yf, short pad)
       {
          wdelch(tela);
          wrefresh(tela);
-         napms(5);
+         napms(delay);
       }
    }
    curs_set(TRUE);
+}
+
+
+//25
+void abrir(WINDOW *tela, short uppery, short abertura, unsigned short delay)
+{
+   curs_set(FALSE);
+   short ys, yd;
+   (abertura % 2 ? (ys = uppery, yd = uppery + 1) : (ys = yd = uppery));
+   for(short i = 0; i < abertura; ys--, yd++, i++)
+   {
+      wmove(tela, ys, 0);
+      wclrtoeol(tela);
+      wmove(tela, yd, 0);
+      wclrtoeol(tela);
+      wrefresh(tela);
+      napms(delay);
+   }
+   curs_set(TRUE);
+}
+
+void logo(unsigned short y, unsigned short x)
+{
+   mvwaddstr(stdscr, y + 0, x, "███████╗ ██████╗██████╗");
+   mvwaddstr(stdscr, y + 1, x, "██╔════╝██╔════╝██╔══██╗");
+   mvwaddstr(stdscr, y + 2, x, "███████╗██║     ██████╔╝");
+   mvwaddstr(stdscr, y + 3, x, "╚════██║██║     ██╔═══╝");
+   mvwaddstr(stdscr, y + 4, x, "███████║╚██████╗██║");
+   mvwaddstr(stdscr, y + 5, x, "╚══════╝ ╚═════╝╚═╝");
 }
 
 void showMainMenu(MenuPrincipal *opc)
@@ -53,17 +85,13 @@ void showMainMenu(MenuPrincipal *opc)
    noecho();
    cbreak();
    mvwaddstr(stdscr, 0, 1, "!Comandos!");
-   mvwaddstr(stdscr, 2, 1, "Cima : Mover para cima");
-   mvwaddstr(stdscr, 3, 1, "Baixo: Mover para baixo");
-   mvwaddstr(stdscr, 4, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 1, 1, "Cima : Mover para cima");
+   mvwaddstr(stdscr, 2, 1, "Baixo: Mover para baixo");
+   mvwaddstr(stdscr, 3, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 4, 1, "Z/z  : Voltar");
 
    
-   mvwaddstr(stdscr,20,95,"███████╗ ██████╗██████╗");
-   mvwaddstr(stdscr,21,95,"██╔════╝██╔════╝██╔══██╗");
-   mvwaddstr(stdscr,22,95,"███████╗██║     ██████╔╝");
-   mvwaddstr(stdscr,23,95,"╚════██║██║     ██╔═══╝");
-   mvwaddstr(stdscr,24,95,"███████║╚██████╗██║");
-   mvwaddstr(stdscr,25,95,"╚══════╝ ╚═════╝╚═╝");
+   logo(20, 95);
    mvwaddstr(stdscr,27,95,"Selecione um opção: ");
    mvwaddstr(stdscr,29,98,"Menu de clientes");
    mvwaddstr(stdscr,30,98,"Menu de produtos");
@@ -83,6 +111,11 @@ void showMainMenu(MenuPrincipal *opc)
    {
       switch(menuKey)
       {
+         case 'Z':
+         case 'z':
+         (*opc) = ENCERRAR_PROGRAMA;
+         goto fim;
+         break;
          case KEY_UP: 
          if(stdy > 29)
          {
@@ -106,11 +139,11 @@ void showMainMenu(MenuPrincipal *opc)
       wrefresh(stdscr);
       menuKey = wgetch(stdscr);
    }
-
+   fim:
+   
    keypad(stdscr, FALSE);
    echo();
    nocbreak();
-   curs_set(TRUE);
 }
 
 void showCustomerMenu(MenuCliente *opc)
@@ -121,17 +154,13 @@ void showCustomerMenu(MenuCliente *opc)
    noecho();
    cbreak();
    mvwaddstr(stdscr, 0, 1, "!Comandos!");
-   mvwaddstr(stdscr, 2, 1, "Cima : Mover para cima");
-   mvwaddstr(stdscr, 3, 1, "Baixo: Mover para baixo");
-   mvwaddstr(stdscr, 4, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 1, 1, "Cima : Mover para cima");
+   mvwaddstr(stdscr, 2, 1, "Baixo: Mover para baixo");
+   mvwaddstr(stdscr, 3, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 4, 1, "Z/z  : Voltar");
 
    
-   mvwaddstr(stdscr,20,95,"███████╗ ██████╗██████╗");
-   mvwaddstr(stdscr,21,95,"██╔════╝██╔════╝██╔══██╗");
-   mvwaddstr(stdscr,22,95,"███████╗██║     ██████╔╝");
-   mvwaddstr(stdscr,23,95,"╚════██║██║     ██╔═══╝");
-   mvwaddstr(stdscr,24,95,"███████║╚██████╗██║");
-   mvwaddstr(stdscr,25,95,"╚══════╝ ╚═════╝╚═╝");
+   logo(20, 95);
    mvwaddstr(stdscr,27,95,"Selecione um opção: ");
    mvwaddstr(stdscr,29,98,"Inserir cliente");
    mvwaddstr(stdscr,30,98,"Listar clientes");
@@ -154,6 +183,11 @@ void showCustomerMenu(MenuCliente *opc)
    {
       switch(menuKey)
       {
+         case 'Z':
+         case 'z':
+         (*opc) = VOLTAR_CLIENTE;
+         goto fim;
+         break;
          case KEY_UP: 
          if(stdy > 29)
          {
@@ -177,16 +211,15 @@ void showCustomerMenu(MenuCliente *opc)
       wrefresh(stdscr);
       menuKey = wgetch(stdscr);
    }
+   fim:
 
    keypad(stdscr, FALSE);
    echo();
    nocbreak();
-   curs_set(TRUE);
 }
 
 void showAddCustomerMenu(Tipos *dataType)
 {
-   //75
    curs_set(FALSE);
    noecho();
    cbreak();
@@ -208,6 +241,11 @@ void showAddCustomerMenu(Tipos *dataType)
    {
       switch(menuKey)
       {
+         case 'Z':
+         case 'z':
+         (*dataType) = NULO;
+         goto fim;
+         break;
          case KEY_UP: 
          if(stdy == 24)
          {
@@ -231,9 +269,10 @@ void showAddCustomerMenu(Tipos *dataType)
       wrefresh(stdscr);
       menuKey = wgetch(stdscr);
    }
+   mvwaddch(stdscr, stdy, 75, ' ');
+   fim:
 
    keypad(stdscr, FALSE);
    echo();
    nocbreak();
-   curs_set(TRUE);
 }

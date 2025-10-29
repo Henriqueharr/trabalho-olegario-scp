@@ -30,6 +30,9 @@ typedef struct GenericCast
    Cliente data;
 } GenericCast;
 
-void* criarCliente(Tipos dataType);
+void* criarCliente(Tipos dataType, List *lista);
+void listarClientes(List *listaClientes);
+Node* findCByID(List *lista, size_t targetID);
+int pathToCNode(List *lista, size_t targetID);
 
 #endif

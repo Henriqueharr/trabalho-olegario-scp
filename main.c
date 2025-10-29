@@ -15,6 +15,9 @@ int main()
    setlocale(LC_ALL,"");
    initscr();
 
+   start_color();
+   init_pair(1, COLOR_GREEN, COLOR_BLACK);
+
    short maxstdy, maxstdx;
    getmaxyx(stdscr, maxstdy, maxstdx);
    List LClientes, LPedidos, LProdutos;
@@ -29,9 +32,8 @@ int main()
       
       showMainMenu(&opc);
       
-      transicao1(stdscr, 0, maxstdy);
+      cortina(stdscr, 27, maxstdy, 25);
 
-      
       switch(opc)
       {
          case MENU_CLIENTES:
@@ -45,16 +47,26 @@ int main()
                {
                   case ADD_CLIENTE:
                   {
-                     Tipos dataType;
-                     transicao1(stdscr, 27, maxstdy);
-                     transicao2(stdscr, 20, 25, 50);
-                     showAddCustomerMenu(&dataType);
-                     void *novoCliente = criarCliente(dataType);
-                     insertNode(&LClientes, novoCliente, dataType);
+                     Tipos dataType = PESSOA_FISICA;
+                     cortina(stdscr, 27, maxstdy, 25);
+                     slideLeft(stdscr, 20, 25, 50, 5);
+                     while(dataType != NULO)
+                     {
+                        showAddCustomerMenu(&dataType);
+                        if(dataType != NULO)
+                        {
+                           void *novoCliente = criarCliente(dataType, &LClientes);
+                           if(novoCliente) createInsertNode(&LClientes, novoCliente, dataType);
+                        }
+                     }
                   }
                   break;
                   case LISTAR_CLIENTES:
-                  mvwaddstr(stdscr, 33, 95, "Listar clientes\n");
+                  {
+                     abrir(stdscr, 28, 29, 25);
+                     listarClientes(&LClientes);
+                     cortina(stdscr, 0, maxstdy, 10);
+                  }
                   break;
                   case EDITAR_CLIENTE:
                   mvwaddstr(stdscr, 33, 95, "Editar clientes\n");

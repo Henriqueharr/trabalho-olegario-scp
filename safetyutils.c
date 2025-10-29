@@ -25,9 +25,9 @@ short lerSizeT(size_t *valor, WINDOW *tela)
    maxy = getmaxy(tela);
    verificarLeitura = mvwscanw(tela, y, x, "%lld", &intermediario);
 
-   if(intermediario < 0) return 0;
-   if(verificarLeitura == 0) return -1;
-   if(verificarLeitura < 0) return -2;
+   if(intermediario < 0) return 0; //valor negativo
+   if(verificarLeitura == 0) return -1; //entrada inválida
+   if(verificarLeitura < 0) return -2; //entrada não encontrada
 
    *valor = intermediario;
    return 1;
@@ -41,7 +41,7 @@ short lerStr(char *str, size_t buffer, WINDOW *tela)
    return validarStr(str);
 }
 
-void lerCPF(char *str, WINDOW *tela)
+short lerCPF(char *str, WINDOW *tela)
 {
     unsigned short x = getcurx(tela), y = getcury(tela);
     unsigned short ind = 0;
@@ -91,11 +91,16 @@ void lerCPF(char *str, WINDOW *tela)
             }
             else
             {
-                mvwaddch(tela, y, x, ' ');
-                wmove(tela, y, x);
+               if(dig == 'z' || dig == 'Z') return 0;
+               else
+               {
+                  mvwaddch(tela, y, x, ' ');
+                  wmove(tela, y, x);
+               }
             }
         }
     }
+    return 1;
 }
 
 bool validar_cpf(char *cpf_ptr) 
@@ -153,12 +158,12 @@ bool validar_cpf(char *cpf_ptr)
    return 0;
 }
 
-void lerCNPJ(char *str, WINDOW *tela)
+short lerCNPJ(char *str, WINDOW *tela)
 {
    unsigned short x = getcurx(tela), y = getcury(tela);
    unsigned short ind = 0;
    strncpy(str, "00.000.000/0001-00\0", 20); //3 8 11 16
-   while(ind < 19)
+   while(ind < 18)
    {
       unsigned short dig = wgetch(tela);
       if(dig >= '0' && dig <= '9')
@@ -209,11 +214,16 @@ void lerCNPJ(char *str, WINDOW *tela)
          }
          else
          {
+            if(dig == 'z' || dig == 'Z') return 0;
+            else
+            {
                mvwaddch(tela, y, x, ' ');
                wmove(tela, y, x);
+            }
          }
       }
    }
+   return 1;
 }
 
 bool validar_cnpj(char *cnpj_ptr) 
