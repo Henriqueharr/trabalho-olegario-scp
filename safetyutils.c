@@ -37,7 +37,7 @@ short lerStr(char *str, size_t buffer, WINDOW *tela)
 {
    unsigned short x, y, maxy = getmaxy(tela);
    getyx(tela, y, x);
-   mvwgetnstr(tela, y, x, str, buffer);
+   mvwgetnstr(tela, y, x, str, buffer - 1);
    return validarStr(str);
 }
 

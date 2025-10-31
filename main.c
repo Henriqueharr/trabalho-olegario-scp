@@ -9,6 +9,8 @@
 #include "pedidos.h"
 #include "safetyutils.h"
 
+#include <string.h>
+
 //Essa é a main :D
 int main()
 {
@@ -24,6 +26,38 @@ int main()
    initList(&LClientes);
    initList(&LPedidos);
    initList(&LProdutos);
+
+   //Debug
+   size_t last = 1000123;
+   for(size_t i = 123; i <= last * 3; i++)
+   {
+      if(i % 2)
+      {
+         PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
+         if(conteudo)
+         {
+            conteudo->data.id = i;
+            strncpy(conteudo->data.name, "PlaceHolder", 100);
+            strncpy(conteudo->data.address, "PlaceHolder\0", 200);
+            strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
+            strncpy(conteudo->cpf, "000.000.000-00\0", 15);
+            createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
+         }
+         continue;
+      }
+      PessoaJuridica* conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
+      if(conteudo)
+      {
+         conteudo->data.id = i;
+         strncpy(conteudo->data.name, "PlaceHolder", 100);
+         strncpy(conteudo->data.address, "PlaceHolder\0", 200);
+         strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
+         strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 15);
+         createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
+      }
+      
+   }
+   //endDebug
    
    MenuPrincipal opc = MENU_CLIENTES;
    
@@ -69,7 +103,10 @@ int main()
                   }
                   break;
                   case EDITAR_CLIENTE:
-                  mvwaddstr(stdscr, 33, 95, "Editar clientes\n");
+                  {
+                     abrir(stdscr, 27, 9, 10);
+                     editarCliente(&LClientes);
+                  }
                   break;
                   case REMOVER_CLIENTE:
                   mvwaddstr(stdscr, 33, 95, "Remover cliente\n");

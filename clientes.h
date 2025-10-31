@@ -19,7 +19,7 @@ typedef struct Cliente
    size_t id;
    char name[100];
    char address[200];
-   char phonenumber[20];
+   char phonenumber[21];
 } Cliente;
 
 //Estrutura de um cliente identificado como pessoa física
@@ -65,6 +65,9 @@ void* criarCliente(Tipos dataType, List *lista);
 
 //Função para listagem e busca de clientes com interface
 void listarClientes(List *listaClientes);
+
+//Comentário fodástico
+void editarCliente(List *listaClientes);
 
 //Funçaõ para achar o endereço na memória de um cliente a partir de seu ID
 Node* findCByID(List *lista, size_t targetID);

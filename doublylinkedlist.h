@@ -47,4 +47,8 @@ void initList(List *lista);
 //Para mais informações em nós, consultar Node
 void createInsertNode(List *lista, void *conteudo, Tipos dataType);
 
+//Remove um nó de uma lista duplamente encadeada
+//O nó deve pertencer a lista passada, comportamento indefinido caso contrário
+void removeNode(List *lista, Node *target);
+
 #endif

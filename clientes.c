@@ -12,14 +12,14 @@ void* criarCliente(Tipos dataType, List *lista)
    WINDOW *telas[5], *subtelas[5];
    for(short i = 0; i < 5; i++)
    {
-      telas[i] = newwin(5, 30, (i + 1) * y, 150);
+      telas[i] = newwin(7, 30, (i + 1) * y, 150);
       wborder(telas[i],  '|', '|', '-', '-', 'O', 'O', 'O', 'O');
       waddstr(telas[i], label[i]);
       if(dataType == PESSOA_JURIDICA && i == 4)
       {
          mvwaddstr(telas[i], 0, 0, label[5]);
       }
-      subtelas[i] = derwin(telas[i], 3, 28, 1, 1);
+      subtelas[i] = derwin(telas[i], 3, 26, 2, 2);
       wrefresh(telas[i]);
       wrefresh(stdscr);
       napms(25);
@@ -37,12 +37,14 @@ void* criarCliente(Tipos dataType, List *lista)
       novoCliente = (PessoaJuridica*)calloc(1, sizeof(PessoaJuridica));
    }
 
+   if(!novoCliente) goto escape;
+
    unsigned short key = KEY_UP;
    MenuCriarCliente opc = ID;
    //ID//Nome//Endereço//Telefone//CPF ou CNPJ//confirmar saida
    unsigned short booleans[6] = {};
    unsigned short tudofeito = 0;
-   unsigned short stdy = 9;
+   unsigned short stdy = 10;
    mvwaddch(stdscr, stdy, 148, '>');
    curs_set(FALSE);
    keypad(stdscr, TRUE);
@@ -83,8 +85,8 @@ void* criarCliente(Tipos dataType, List *lista)
          {
             case ID:
             {
-               cortina(subtelas[opc - 1], 0, 3, 25);
-               wmove(subtelas[opc - 1], 1, 3);
+               cortina(subtelas[opc - 1], 0, 3, 10);
+               wmove(subtelas[opc - 1], 0, 0);
                short check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
                Node* repetido = findCByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
                while(check != 1 || repetido)
@@ -111,8 +113,8 @@ void* criarCliente(Tipos dataType, List *lista)
             break;
             case NOME:
             {
-               cortina(subtelas[opc - 1], 0, 3, 25);
-               wmove(subtelas[opc - 1], 1, 3);
+               cortina(subtelas[opc - 1], 0, 3, 10);
+               wmove(subtelas[opc - 1], 0, 0);
                short check = lerStr(get_ctype(novoCliente,GenericCast)->data.name, sizeof(get_ctype(novoCliente,GenericCast)->data.name), subtelas[opc - 1]);
                while(check != 1)
                {
@@ -133,8 +135,8 @@ void* criarCliente(Tipos dataType, List *lista)
             break;
             case ENDERECO:
             {
-               cortina(subtelas[opc - 1], 0, 3, 25);
-               wmove(subtelas[opc - 1], 1, 3);
+               cortina(subtelas[opc - 1], 0, 3, 10);
+               wmove(subtelas[opc - 1], 0, 0);
                short check = lerStr(get_ctype(novoCliente,GenericCast)->data.address, sizeof(get_ctype(novoCliente,GenericCast)->data.address), subtelas[opc - 1]);
                while(check != 1)
                {
@@ -154,8 +156,8 @@ void* criarCliente(Tipos dataType, List *lista)
             break;
             case TELEFONE:
             {
-               cortina(subtelas[opc - 1], 0, 3, 25);
-               wmove(subtelas[opc - 1], 1, 3);
+               cortina(subtelas[opc - 1], 0, 3, 10);
+               wmove(subtelas[opc - 1], 0, 0);
                short check = lerStr(get_ctype(novoCliente,GenericCast)->data.phonenumber, sizeof(get_ctype(novoCliente,GenericCast)->data.phonenumber), subtelas[opc - 1]);
                while(check != 1)
                {
@@ -177,10 +179,10 @@ void* criarCliente(Tipos dataType, List *lista)
             case CPF_CNPJ:
             {
                cbreak();
-               cortina(subtelas[opc - 1], 0, 3, 25);
+               cortina(subtelas[opc - 1], 0, 3, 10);
                if(dataType == PESSOA_FISICA)
                {
-                  wmove(subtelas[opc - 1], 1, 3);
+                  wmove(subtelas[opc - 1], 0, 0);
                   keypad(subtelas[opc - 1], TRUE);
                   short confirmou = lerCPF(get_ctype(novoCliente,PessoaFisica)->cpf, subtelas[opc - 1]);
                   keypad(subtelas[opc - 1], FALSE);
@@ -216,7 +218,7 @@ void* criarCliente(Tipos dataType, List *lista)
                }
                else
                {
-                  wmove(subtelas[opc - 1], 1, 3);
+                  wmove(subtelas[opc - 1], 0, 0);
                   keypad(subtelas[opc - 1], TRUE);
                   short confirmou = lerCNPJ(get_ctype(novoCliente,PessoaJuridica)->cnpj, subtelas[opc - 1]);
                   keypad(subtelas[opc - 1], FALSE);
@@ -276,7 +278,7 @@ void* criarCliente(Tipos dataType, List *lista)
       {
          unsigned short x, y;
          getyx(stdscr, y, x);
-         mvwaddstr(stdscr, 44, 150, "Salvar cliente");
+         mvwaddstr(stdscr, 45, 150, "Salvar cliente");
          wmove(stdscr, y, x);
       }
 
@@ -285,7 +287,7 @@ void* criarCliente(Tipos dataType, List *lista)
 
    for(short i = 0; i < 5; i++)
    {
-      cortina(telas[i], 0, 5, 25);
+      cortina(telas[i], 0, 7, 15);
       delwin(subtelas[i]);
       delwin(telas[i]);
    }
@@ -297,7 +299,7 @@ void* criarCliente(Tipos dataType, List *lista)
    escape:
    for(short i = 0; i < 5; i++)
    {
-      cortina(telas[i], 0, 5, 25);
+      cortina(telas[i], 0, 7, 20);
       delwin(subtelas[i]);
       delwin(telas[i]);
    }
@@ -320,7 +322,7 @@ void listarClientes(List *listaClientes)
    
    Node *pagina[n];
    
-   if(n == 0) goto listavazia;
+   if(!listaClientes->head) goto listavazia;
    
    Node *atual = listaClientes->head;
 
@@ -342,18 +344,18 @@ void listarClientes(List *listaClientes)
    mvwaddstr(stdscr, 4, 1, "I/i     : Consultar por ID");
    mvwaddstr(stdscr, 5, 1, "Enter   : Confirmar");
    mvwaddstr(stdscr, 6, 1, "Z/z     : Voltar");
-   mvwaddstr(stdscr, maxy - 19, 2, "  ██╗");
-   mvwaddstr(stdscr, maxy - 18, 2, " ██╔╝");
-   mvwaddstr(stdscr, maxy - 17, 2, "██╔╝ ");
-   mvwaddstr(stdscr, maxy - 16, 2, "╚██╗ ");
-   mvwaddstr(stdscr, maxy - 15, 2, " ╚██╗");
-   mvwaddstr(stdscr, maxy - 14, 2, "  ╚═╝");
-   mvwaddstr(stdscr, maxy - 19, maxx - 7, "██╗  ");
-   mvwaddstr(stdscr, maxy - 18, maxx - 7, "╚██╗ ");
-   mvwaddstr(stdscr, maxy - 17, maxx - 7, " ╚██╗");
-   mvwaddstr(stdscr, maxy - 16, maxx - 7, " ██╔╝");
-   mvwaddstr(stdscr, maxy - 15, maxx - 7, "██╔╝ ");
-   mvwaddstr(stdscr, maxy - 14, maxx - 7, "╚═╝  ");
+   mvwaddstr(stdscr, maxy - 21, 2, "  ██╗");
+   mvwaddstr(stdscr, maxy - 20, 2, " ██╔╝");
+   mvwaddstr(stdscr, maxy - 19, 2, "██╔╝ ");
+   mvwaddstr(stdscr, maxy - 18, 2, "╚██╗ ");
+   mvwaddstr(stdscr, maxy - 17, 2, " ╚██╗");
+   mvwaddstr(stdscr, maxy - 16, 2, "  ╚═╝");
+   mvwaddstr(stdscr, maxy - 21, maxx - 7, "██╗  ");
+   mvwaddstr(stdscr, maxy - 20, maxx - 7, "╚██╗ ");
+   mvwaddstr(stdscr, maxy - 19, maxx - 7, " ╚██╗");
+   mvwaddstr(stdscr, maxy - 18, maxx - 7, " ██╔╝");
+   mvwaddstr(stdscr, maxy - 17, maxx - 7, "██╔╝ ");
+   mvwaddstr(stdscr, maxy - 16, maxx - 7, "╚═╝  ");
 
    wrefresh(stdscr);
 
@@ -361,11 +363,11 @@ void listarClientes(List *listaClientes)
 
    logo(4, maxx/2 - 11);
    
-   WINDOW *selecaoPagina = newwin(3, 17, yi - 3, xi[0]);
-   WINDOW *subsel = derwin(selecaoPagina, 1, 7, 1, 1);
+   WINDOW *selecaoPagina = newwin(3, 19, yi - 3, xi[0]);
+   WINDOW *subsel = derwin(selecaoPagina, 1, 8, 1, 1);
    wborder(selecaoPagina, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
    mvwaddstr(selecaoPagina, 0, 0, "Página");
-   mvwprintw(selecaoPagina, 1, 1, "       /%d", n);
+   mvwprintw(selecaoPagina, 1, 1, "        /%d", n);
    wrefresh(selecaoPagina);
    
    WINDOW *telas[6];
@@ -515,8 +517,8 @@ void listarClientes(List *listaClientes)
          case 'I':
          case 'i':
          {
-            WINDOW *selid = newwin(3, 17, maxy - 41, xi[0]);
-            WINDOW *subselid = derwin(selid, 1, 15, 1, 1);
+            WINDOW *selid = newwin(3, 25, maxy - 41, xi[0]);
+            WINDOW *subselid = derwin(selid, 1, 23, 1, 1);
             wborder(selid, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
             mvwaddstr(selid, 0, 0, "Consultar ID");
             wrefresh(selid);
@@ -596,7 +598,7 @@ void listarClientes(List *listaClientes)
 
    for(unsigned short i = 0; i < 6; i++)
    {
-      abrir(telas[i], 8, 15, 25);
+      abrir(telas[i], 8, 15, 15);
       delwin(subtelas[i]);
       delwin(telas[i]);
    }
@@ -608,12 +610,27 @@ void listarClientes(List *listaClientes)
    curs_set(TRUE);
 }
 
+void editarCliente(List *listaClientes)
+{
+   noecho();
+   cbreak();
+   unsigned short maxy = getmaxy(stdscr), maxx = getmaxx(stdscr);
+
+   if(!listaClientes) goto listavazia;
+
+   
+
+   return;
+
+   listavazia:
+   curs_set(FALSE);
+   gerarErro(10, 30, maxy/2 - 5, maxx/2 - 15, "||~~OOOO", "Erro de carregamento", "A lista de clientes encontra-se vazia no momento");
+   curs_set(TRUE);
+}
+
 Node* findCByID(List *lista, size_t targetID)
 {
-   if(!lista->head)
-   {
-      return NULL;
-   }
+   if(!lista->head) return NULL;
    
    for(Node* begin = lista->head; begin; begin = begin->next) if(get_content(begin,GenericCast)->data.id == targetID) return begin;   
 
@@ -622,11 +639,8 @@ Node* findCByID(List *lista, size_t targetID)
 
 int pathToCNode(List *lista, size_t targetID)
 {
-   if(!lista->head)
-   {
-      return -1;
-   }
-
+   if(!lista->head) return -1;
+   
    int dist = 0;
    
    for(Node* begin = lista->head; begin; begin = begin->next, dist++) if(get_content(begin,GenericCast)->data.id == targetID) return dist;   
