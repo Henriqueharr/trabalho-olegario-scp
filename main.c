@@ -11,17 +11,23 @@
 
 #include <string.h>
 
+extern double teladevy, teladevx;
+
+//Tela dev
+// 49 // Y
+// 211 // X
+
 //Essa é a main :D
 int main()
 {
    setlocale(LC_ALL,"");
    initscr();
 
+   unsigned short maxstdy, maxstdx;
+
    start_color();
    init_pair(1, COLOR_GREEN, COLOR_BLACK);
 
-   short maxstdy, maxstdx;
-   getmaxyx(stdscr, maxstdy, maxstdx);
    List LClientes, LPedidos, LProdutos;
    initList(&LClientes);
    initList(&LPedidos);
@@ -63,10 +69,9 @@ int main()
    
    while(opc != ENCERRAR_PROGRAMA)
    {
-      
       showMainMenu(&opc);
-      
-      cortina(stdscr, 27, maxstdy, 25);
+      getmaxyx(stdscr, maxstdy, maxstdx);
+      cortina(stdscr, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 12, 25);
 
       switch(opc)
       {
@@ -76,14 +81,15 @@ int main()
             while(escolha != VOLTAR_CLIENTE)
             {
                showCustomerMenu(&escolha);
+               getmaxyx(stdscr, maxstdy, maxstdx);
 
                switch(escolha)
                {
                   case ADD_CLIENTE:
                   {
                      Tipos dataType = PESSOA_FISICA;
-                     cortina(stdscr, 27, maxstdy, 25);
-                     slideLeft(stdscr, 20, 25, 50, 5);
+                     cortina(stdscr, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
+                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 50, 5);
                      while(dataType != NULO)
                      {
                         showAddCustomerMenu(&dataType);
@@ -97,28 +103,29 @@ int main()
                   break;
                   case LISTAR_CLIENTES:
                   {
-                     abrir(stdscr, 28, 29, 25);
+                     abrir(stdscr, maxstdy * (20.0/teladevy) + 8, 29, 25);
                      listarClientes(&LClientes);
                      cortina(stdscr, 0, maxstdy, 10);
                   }
                   break;
                   case EDITAR_CLIENTE:
                   {
-                     abrir(stdscr, 27, 9, 10);
+                     cortina(stdscr, maxstdy * (20.0/teladevy) + 6, maxstdy, 5);
+                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 75, 2);
                      editarCliente(&LClientes);
                   }
                   break;
                   case REMOVER_CLIENTE:
-                  mvwaddstr(stdscr, 33, 95, "Remover cliente\n");
+                  mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Remover cliente\n");
                   break;
                   case SALVAR_CLIENTES_CSV:
-                  mvwaddstr(stdscr, 33, 95, "Salvar clientes\n");
+                  mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Salvar clientes\n");
                   break;
                   case CARREGAR_CLIENTES_CSV:
-                  mvwaddstr(stdscr, 33, 95, "Carregar clientes\n");
+                  mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Carregar clientes\n");
                   break;
                   case VOLTAR_CLIENTE:
-                  mvwaddstr(stdscr, 33, 95, "Saindo do menu de clientes\n");
+                  mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Saindo do menu de clientes\n");
                   break;
                }
                wrefresh(stdscr);
@@ -127,13 +134,13 @@ int main()
          }
          break;
          case MENU_PRODUTOS:
-         mvwaddstr(stdscr, 33, 95, "Produtos selecionados\n");
+         mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Produtos selecionados\n");
          break;
          case MENU_PEDIDOS:
-         mvwaddstr(stdscr, 33, 95, "Pedidos selecionados\n");
+         mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Pedidos selecionados\n");
          break;
          case ENCERRAR_PROGRAMA:
-         mvwaddstr(stdscr, 33, 95, "Encerrando programa\n");
+         mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Encerrando programa\n");
          break;
       }
       wrefresh(stdscr);

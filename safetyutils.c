@@ -6,6 +6,8 @@
 #include "safetyutils.h"
 #include "menus.h"
 
+extern double teladevy, teladevx;
+
 short validarStr(const char *str)
 {
    if(*str == ' ') return -1;

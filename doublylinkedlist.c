@@ -3,7 +3,6 @@
 #include "vector.h"
 #include "doublylinkedlist.h"
              
-
 void initList(List *lista)
 {
    lista->head = NULL;

@@ -70,6 +70,7 @@
       "stdlib.h": "c",
       "vector.h": "c",
       "ncurses.h": "c",
-      "pedidos.h": "c"
+      "pedidos.h": "c",
+      "menus.h": "c"
    }
 }

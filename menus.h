@@ -96,12 +96,13 @@ void cortina(WINDOW * tela, short yi, short yf, unsigned short delay);
 
 //Mova todos os caracteres de um range de linhas para a esquerda
 //pad é quantas colunas para esquerda as linhas irão
+//relx é a coluna que irá atrair tudo que está a direita
 //As linhas se movem igualmente 
-void slideLeft(WINDOW *tela, short yi, short yf, short pad, unsigned short delay);
+void slideLeft(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short pad, unsigned short delay);
 
 //Transição no estilo de abertura a partir do centro com a demora escolhida
 //Se a qauntidade de linhas a abrir for impar, escolha a altura do meio para o inicio, e a altura imediatamente acima do centro caso contrário
-void abrir(WINDOW *tela, short uppery, short abertura, unsigned short delay);
+void abrir(WINDOW *tela, unsigned short uppery, unsigned short abertura, unsigned short delay);
 
 //Gera a logo da SCP a partir de na coordenada escolhida a partir de seu canto superior esquerdo
 //A logo tem 6 de altura por 24 de largura
