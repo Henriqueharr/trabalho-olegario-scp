@@ -11,11 +11,11 @@
 
 #include <string.h>
 
+//Tela dev
+// 49.0 // Y
+// 211.0 // X
 extern double teladevy, teladevx;
 
-//Tela dev
-// 49 // Y
-// 211 // X
 
 //Essa é a main :D
 int main()
@@ -27,6 +27,8 @@ int main()
 
    start_color();
    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+   init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(3, COLOR_RED, COLOR_BLACK);
 
    List LClientes, LPedidos, LProdutos;
    initList(&LClientes);
@@ -37,15 +39,15 @@ int main()
    size_t last = 1000123;
    for(size_t i = 123; i <= last * 3; i++)
    {
-      if(i % 2)
+      if(rand() % 2)
       {
          PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
          if(conteudo)
          {
             conteudo->data.id = i;
-            strncpy(conteudo->data.name, "PlaceHolder", 100);
-            strncpy(conteudo->data.address, "PlaceHolder\0", 200);
-            strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
+            strncpy(conteudo->data.name, "Lucas Oliver", 100);
+            strncpy(conteudo->data.address, "Barra da Tijuca\0", 200);
+            strncpy(conteudo->data.phonenumber, "75983475\0", 20);
             strncpy(conteudo->cpf, "000.000.000-00\0", 15);
             createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
          }
@@ -58,7 +60,7 @@ int main()
          strncpy(conteudo->data.name, "PlaceHolder", 100);
          strncpy(conteudo->data.address, "PlaceHolder\0", 200);
          strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
-         strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 15);
+         strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
          createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
       }
       
@@ -71,7 +73,7 @@ int main()
    {
       showMainMenu(&opc);
       getmaxyx(stdscr, maxstdy, maxstdx);
-      cortina(stdscr, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 12, 25);
+      cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 12, 25);
 
       switch(opc)
       {
@@ -88,8 +90,8 @@ int main()
                   case ADD_CLIENTE:
                   {
                      Tipos dataType = PESSOA_FISICA;
-                     cortina(stdscr, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
-                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 50, 5);
+                     cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
+                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, maxstdx * (50.0/teladevx), 5);
                      while(dataType != NULO)
                      {
                         showAddCustomerMenu(&dataType);
@@ -105,13 +107,13 @@ int main()
                   {
                      abrir(stdscr, maxstdy * (20.0/teladevy) + 8, 29, 25);
                      listarClientes(&LClientes);
-                     cortina(stdscr, 0, maxstdy, 10);
+                     cortina(stdscr, 0, 0, maxstdy, 10);
                   }
                   break;
                   case EDITAR_CLIENTE:
                   {
-                     cortina(stdscr, maxstdy * (20.0/teladevy) + 6, maxstdy, 5);
-                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 75, 2);
+                     cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 6, maxstdy, 5);
+                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, maxstdx * (75.0/teladevx), 2);
                      editarCliente(&LClientes);
                   }
                   break;

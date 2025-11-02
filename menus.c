@@ -8,7 +8,7 @@
 
 double teladevy = 49.0, teladevx = 211.0;
 
-void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg)
+void gerarAviso(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg)
 {
    WINDOW *erro = newwin(altura, largura, yi, xi);
    WINDOW *subtela = derwin(erro, altura - 2, largura - 2, 1, 1);
@@ -16,17 +16,17 @@ void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi,
    mvwprintw(subtela, 0, 0, "%s\n\n%s\n\nPressione qualquer tecla para continuar", titulo, msg);
    keypad(erro, FALSE);
    wgetch(erro);
-   cortina(erro, 0, altura, 20);
+   cortina(erro, 0, 0, altura, 20);
    delwin(subtela);
    delwin(erro);
 }
 
-void cortina(WINDOW * tela, short yi, short yf, unsigned short delay)
+void cortina(WINDOW * tela, unsigned short relx, short yi, short yf, unsigned short delay)
 {
    curs_set(FALSE);
    unsigned short x, y;
    getyx(tela, y, x);
-   for(short i = yi; i <= yf; i++) {wmove(tela, i, 0); wclrtoeol(tela); wrefresh(tela); napms(delay);};
+   for(short i = yi; i <= yf; i++) {wmove(tela, i, relx); wclrtoeol(tela); wrefresh(tela); napms(delay);};
    wmove(tela, y, x);
    curs_set(TRUE);
 }
@@ -52,7 +52,7 @@ void abrir(WINDOW *tela, unsigned short uppery, unsigned short abertura, unsigne
    curs_set(FALSE);
    unsigned short ys, yd;
    (abertura % 2 ? (ys = uppery, yd = uppery + 1) : (ys = yd = uppery));
-   for(unsigned short i = 0; i < abertura; ys--, yd++, i++)
+   for(unsigned short i = 0; i <= abertura; ys--, yd++, i++)
    {
       wmove(tela, ys, 0);
       wclrtoeol(tela);

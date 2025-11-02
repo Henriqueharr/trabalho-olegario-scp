@@ -88,11 +88,11 @@ typedef enum MenuCriarCliente{ID = 1,
 //String de 8 exatamente 8 caracteres para definir caracteres da lateral esquerda e direita, teto, chão e cantos em sentido horário, respectivamente
 //String com o título do erro
 //String com a mensagem do erro
-void gerarErro(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg);
+void gerarAviso(unsigned short altura, unsigned short largura, unsigned short yi, unsigned short xi, const char *bordas, const char *titulo, const char *msg);
 
 //Transição de tela no estilo de cortina
 //Escolha a janela, a altura inicial e até onde descerá, além da demora para executar
-void cortina(WINDOW * tela, short yi, short yf, unsigned short delay);
+void cortina(WINDOW * tela, unsigned short relx, short yi, short yf, unsigned short delay);
 
 //Mova todos os caracteres de um range de linhas para a esquerda
 //pad é quantas colunas para esquerda as linhas irão

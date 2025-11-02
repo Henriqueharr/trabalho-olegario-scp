@@ -20,6 +20,10 @@ bool todos_digitos_iguais(const char *str);
 
 //Essa função lê de forma segura variáveis do tipo size_t (unsigned long)
 //Deve ser especificado qual tela do ncurses está coletando o input
+//Retorna 0 em caso de valor negativo
+//Retorna -1 caso sejam detectadas caracteres não numéricos no input
+//Retorna -2 caso não tenha entrada
+//Retorna 1 em leitura bem sucedida
 short lerSizeT(size_t *valor, WINDOW *tela);
 
 //Essa função lê strings a partir de uma tela e da capacidade da string
