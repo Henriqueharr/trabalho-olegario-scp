@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <stdbool.h>
+#include "clientes.h"
 #include "safetyutils.h"
 #include "menus.h"
 
@@ -30,6 +31,7 @@ short lerSizeT(size_t *valor, WINDOW *tela)
    if(intermediario < 0) return 0; //valor negativo
    if(verificarLeitura == 0) return -1; //entrada inválida
    if(verificarLeitura < 0) return -2; //entrada não encontrada
+   if(intermediario == 0) return -3; //Cancelou
 
    *valor = intermediario;
    return 1;
@@ -290,4 +292,111 @@ bool todos_digitos_iguais(const char *str) {
       if (str[i] != str[0]) return 0;
    }
    return 1;
+}
+
+char* addChar(char *ptr, char c)
+{
+   ptr = (char*)realloc(ptr, (strlen(ptr) + 2) * sizeof(char));
+   *(ptr + strlen(ptr) + 1) = '\0';
+   *(ptr + strlen(ptr)) = c;
+   return ptr;
+}
+
+char **split(char *str)
+{
+   char **substrs = (char**)malloc(sizeof(char*));
+   char *atributo = strtok(str, ";");
+
+   for(short i = 0; atributo; i++)
+   {
+      *(substrs + i) = atributo;
+      substrs = (char**)realloc(substrs, (i + 2) * sizeof(char*));
+      atributo = strtok(NULL, ";");
+   }
+
+   return substrs;
+}
+
+void carregarDados(List *lista, const char *nomeArquivo)
+{
+   FILE *csv = fopen(nomeArquivo, "r");
+
+   if(!csv) return;
+
+   if(strcmp(nomeArquivo, "clientes.csv") == 0)
+   {
+      char buffer[500];
+
+      while(fgets(buffer, sizeof(buffer), csv))
+      {
+         buffer[strcspn(buffer, "\n")] = '\0';
+
+         char *restante;
+
+         char **atributos = split(buffer);
+
+         if(atributos[4][2] == '.')
+         {
+            PessoaJuridica *conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
+            conteudo->data.id = strtoul(atributos[0], &restante, 10);
+            strcpy(conteudo->data.name, atributos[1]);
+            strcpy(conteudo->data.address, atributos[2]);
+            strcpy(conteudo->data.phonenumber, atributos[3]);
+            strcpy(conteudo->cnpj, atributos[4]);
+
+            createInsertNode(lista, conteudo, PESSOA_JURIDICA);
+
+            free(atributos);
+
+            continue;
+         }
+
+         PessoaFisica *conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
+         conteudo->data.id = strtoul(atributos[0], &restante, 10);
+         strcpy(conteudo->data.name, atributos[1]);
+         strcpy(conteudo->data.address, atributos[2]);
+         strcpy(conteudo->data.phonenumber, atributos[3]);
+         strcpy(conteudo->cpf, atributos[4]);
+
+         createInsertNode(lista, conteudo, PESSOA_FISICA);
+
+         free(atributos);
+      }
+
+      fclose(csv);
+
+      return;
+   }
+}
+
+void SalvarDados(List *lista, const char *nomeArquivo)
+{
+   FILE *csv = fopen(nomeArquivo, "w");
+
+   if(!csv) return;
+
+   char buffer[BUFSIZ * 20];
+   setvbuf(csv, buffer, _IOFBF, sizeof(buffer));
+
+   if(strcmp(nomeArquivo, "clientes.csv") == 0)
+   {
+      for(Node *atual = lista->head; atual; atual = atual->next)
+      {
+         fprintf(csv, "%zu;%s;%s;%s;%s\n",
+                        expand_node(atual, GenericCast)->data.id,
+                        expand_node(atual, GenericCast)->data.name,
+                        expand_node(atual, GenericCast)->data.address,
+                        expand_node(atual, GenericCast)->data.phonenumber,
+                        ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
+      }
+
+      goto salvou;
+   }
+
+
+
+   salvou:
+   char retorno[BUFSIZ];
+   setvbuf(csv, retorno, _IOFBF, sizeof(retorno));
+   fclose(csv);
 }

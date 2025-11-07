@@ -1,12 +1,12 @@
 #ifndef VECTOR_UTILS_H
 #define VECTOR_UTILS_H
 
-#define get_value(vector_ptr,type,position) (*((type*)vector_ptr.container[position]))
+#define access_index(vector_ptr,type,position) (*((type*)vector_ptr.container[position]))
 
 //Um Vector é um vetor/array de tamanho dinâmico
 //Essa estrutura busca imitar o comportamento de um vector do C++
 //Ela deve sempre ser inicializada com a função initVector
-//Para acessar um elemento do Vector com mais facilidade, use o macro get_value
+//Para acessar um elemento do Vector com mais facilidade, use o macro access_index
 //
 // typedef struct Vector
 // {

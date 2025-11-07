@@ -40,5 +40,12 @@ short lerCPF(char *str, WINDOW *tela);
 //Deve ser especificado qual tela do ncurses está coletando o input
 short lerCNPJ(char *str, WINDOW *tela);
 
+char* addChar(char *ptr, char c);
+
+char **split(char *str);
+
+void carregarDados(List *lista, const char *nomeArquivo);
+
+void SalvarDados(List *lista, const char *nomeArquivo);
 
 #endif

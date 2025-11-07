@@ -104,6 +104,7 @@ void* criarCliente(Tipos dataType, List *lista)
                cortina(subtelas[opc - 1], 0, 0, y * (3.0/7.0), 10);
                wmove(subtelas[opc - 1], 0, 0);
                short check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
+               if(check == -3) goto pulouID;
                Node* repetido = findCByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
                while(check != 1 || repetido)
                {
@@ -122,11 +123,21 @@ void* criarCliente(Tipos dataType, List *lista)
                   wrefresh(subtelas[opc - 1]);
                   wmove(subtelas[opc - 1], 0, 0);
                   check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
+                  if(check == -3) goto pulouID;
                   curs_set(FALSE);
                   repetido = findCByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
+
                }
+               werase(subtelas[opc - 1]);
+               mvwprintw(subtelas[opc - 1], 0, 0, "%zu", get_ctype(novoCliente,GenericCast)->data.id);
+               wrefresh(subtelas[opc - 1]);
                preenchidos[opc - 1] = 1;
             }
+            break;
+            pulouID:
+            werase(subtelas[opc - 1]);
+            if(preenchidos[opc - 1]) mvwprintw(subtelas[opc - 1], 0, 0, "%zu", get_ctype(novoCliente,GenericCast)->data.id);
+            wrefresh(subtelas[opc - 1]);
             break;
             case NOME:
             {
@@ -346,6 +357,10 @@ void listarClientes(List *listaClientes)
    
    Node *pagina[n];
    
+   unsigned short ytamerro = maxstdy * (10.0/teladevy);
+   unsigned short xtamerro = maxstdx * (30.0/teladevx);
+   unsigned short yposerro = maxstdy * (2.0/teladevy);
+   
    if(!listaClientes->head) goto listavazia;
    
    Node *atual = listaClientes->head;
@@ -418,9 +433,6 @@ void listarClientes(List *listaClientes)
    
    wnoutrefresh(stdscr);
 
-   unsigned short ytamerro = maxstdy * (10.0/teladevy);
-   unsigned short xtamerro = maxstdx * (30.0/teladevx);
-   unsigned short yposerro = maxstdy * (2.0/teladevy);
 
    keypad(stdscr, TRUE);
    unsigned short cmd = KEY_LEFT;
@@ -444,11 +456,11 @@ void listarClientes(List *listaClientes)
                   if(atual)
                   {
                      mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nNome: %s\n\nEndereço : %s\n\nTelefone: %s\n\nCPF/CNPJ: %s",
-                                                   get_content(atual, GenericCast)->data.id,
-                                                   get_content(atual, GenericCast)->data.name,
-                                                   get_content(atual, GenericCast)->data.address,
-                                                   get_content(atual, GenericCast)->data.phonenumber,
-                                                   ((atual->dataType == PESSOA_FISICA) ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+                                                   expand_node(atual, GenericCast)->data.id,
+                                                   expand_node(atual, GenericCast)->data.name,
+                                                   expand_node(atual, GenericCast)->data.address,
+                                                   expand_node(atual, GenericCast)->data.phonenumber,
+                                                   ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
                      wnoutrefresh(subtelas[i]);
                      atual = atual->next;
                   }
@@ -472,11 +484,11 @@ void listarClientes(List *listaClientes)
                   if(atual)
                   {
                      mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nNome: %s\n\nEndereço : %s\n\nTelefone: %s\n\nCPF/CNPJ: %s",
-                                                   get_content(atual, GenericCast)->data.id,
-                                                   get_content(atual, GenericCast)->data.name,
-                                                   get_content(atual, GenericCast)->data.address,
-                                                   get_content(atual, GenericCast)->data.phonenumber,
-                                                   ((atual->dataType == PESSOA_FISICA) ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+                                                   expand_node(atual, GenericCast)->data.id,
+                                                   expand_node(atual, GenericCast)->data.name,
+                                                   expand_node(atual, GenericCast)->data.address,
+                                                   expand_node(atual, GenericCast)->data.phonenumber,
+                                                   ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
                      wnoutrefresh(subtelas[i]);
                      atual = atual->next;
                   }
@@ -501,22 +513,22 @@ void listarClientes(List *listaClientes)
                curs_set(FALSE);
                if(check == 0) 
                {
-                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
                   goto duploerro;
                }
                if(check == -1) 
                {
-                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
                   goto duploerro;
                }
                if(check == -2) 
                {
-                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
                   goto duploerro;
                }
                if(ind > n || ind <= 0)
                {
-                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "A página requisitada não existe");
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "A página requisitada não existe");
                }
                duploerro:
                werase(subsel);
@@ -541,11 +553,11 @@ void listarClientes(List *listaClientes)
                if(atual)
                {
                   mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nNome: %s\n\nEndereço : %s\n\nTelefone: %s\n\nCPF/CNPJ: %s",
-                                                get_content(atual, GenericCast)->data.id,
-                                                get_content(atual, GenericCast)->data.name,
-                                                get_content(atual, GenericCast)->data.address,
-                                                get_content(atual, GenericCast)->data.phonenumber,
-                                                ((atual->dataType == PESSOA_FISICA) ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+                                                expand_node(atual, GenericCast)->data.id,
+                                                expand_node(atual, GenericCast)->data.name,
+                                                expand_node(atual, GenericCast)->data.address,
+                                                expand_node(atual, GenericCast)->data.phonenumber,
+                                                ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
                   wnoutrefresh(subtelas[i]);
                   atual = atual->next;
                }
@@ -566,21 +578,24 @@ void listarClientes(List *listaClientes)
             wmove(subselid, 0, 0);
             size_t targetID;
             short check = lerSizeT(&targetID, subselid);
+            if(check == -3) goto cancelarID;
             while(check != 1)
             {
                cbreak();
                noecho();
                curs_set(FALSE); 
-               if(check == 0) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
-               if(check == -1) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
-               if(check == -2) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+               if(check == 0) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+               if(check == -1) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+               if(check == -2) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
                nocbreak();
                echo();
                curs_set(TRUE);
+               repetirID:
                werase(subselid);
                wrefresh(subselid);
                wmove(subselid, 1, 3);
                check = lerSizeT(&targetID, subselid);
+               if(check == -3) goto cancelarID;
             }
             int dist = pathToCNode(listaClientes, targetID);
             if(dist == -1)
@@ -588,16 +603,11 @@ void listarClientes(List *listaClientes)
                cbreak();
                noecho();
                curs_set(FALSE);
-               gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamerro - xtamaba) * 0.5, "||~~OOOO", "Erro de busca", "O identificador solicitado não existe");
+               gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de busca", "O identificador solicitado não existe");
                nocbreak();
                echo();
                curs_set(TRUE);
-               cortina(selid, 0, 0, 3, 25);
-               delwin(subselid);
-               delwin(selid);
-               noecho();
-               cbreak();
-               break;
+               goto repetirID;
             }
             ind = dist / 6;
             werase(subsel);
@@ -610,18 +620,19 @@ void listarClientes(List *listaClientes)
                wnoutrefresh(subtelas[i]);
                if(atual)
                {
-                  if(get_content(atual, GenericCast)->data.id == targetID) wattron(subtelas[i], COLOR_PAIR(1));
+                  if(expand_node(atual, GenericCast)->data.id == targetID) wattron(subtelas[i], COLOR_PAIR(1));
                   mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nNome: %s\n\nEndereço : %s\n\nTelefone: %s\n\nCPF/CNPJ: %s",
-                                                get_content(atual, GenericCast)->data.id,
-                                                get_content(atual, GenericCast)->data.name,
-                                                get_content(atual, GenericCast)->data.address,
-                                                get_content(atual, GenericCast)->data.phonenumber,
-                                                ((atual->dataType == PESSOA_FISICA) ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+                                                expand_node(atual, GenericCast)->data.id,
+                                                expand_node(atual, GenericCast)->data.name,
+                                                expand_node(atual, GenericCast)->data.address,
+                                                expand_node(atual, GenericCast)->data.phonenumber,
+                                                ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
                   wnoutrefresh(subtelas[i]);
                   wattroff(subtelas[i], COLOR_PAIR(1));
                   atual = atual->next;
                }
             }
+            cancelarID:
             cortina(selid, 0, 0, 3, 25);
             delwin(subselid);
             delwin(selid);
@@ -643,6 +654,7 @@ void listarClientes(List *listaClientes)
    }
 
    return;
+
    listavazia:
    curs_set(FALSE);
    gerarAviso(ytamerro, xtamerro, maxstdy * 0.5 - (ytamerro) * 0.5, maxstdx * 0.5 - (xtamerro) * 0.5, "||~~OOOO", "Erro de carregamento", "A lista de clientes encontra-se vazia no momento");
@@ -656,7 +668,7 @@ void editarCliente(List *listaClientes)
    noecho();
    cbreak();
 
-   if(!listaClientes) goto listavazia;
+   if(!listaClientes->head) goto listavazia;
 
    unsigned short ydadostam = maxstdy * (20.0/teladevy);
    unsigned short xdadostam = maxstdx * (45.0/teladevx);
@@ -711,12 +723,12 @@ void editarCliente(List *listaClientes)
             unsigned short x = maxstdx * (30.0/teladevx);
             unsigned short xpos = maxstdx * (105.0/teladevx);
 
-            size_t idAlt = get_content(atual, GenericCast)->data.id;
+            size_t idAlt = expand_node(atual, GenericCast)->data.id;
             char nome[100], endereco[200], telefone[21], cpf_cnpj[20];
-            strncpy(nome, get_content(atual, GenericCast)->data.name, 100);
-            strncpy(endereco, get_content(atual, GenericCast)->data.address, 200);
-            strncpy(telefone, get_content(atual, GenericCast)->data.phonenumber, 21);
-            strcpy(cpf_cnpj, (atual->dataType == PESSOA_FISICA ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+            strncpy(nome, expand_node(atual, GenericCast)->data.name, 100);
+            strncpy(endereco, expand_node(atual, GenericCast)->data.address, 200);
+            strncpy(telefone, expand_node(atual, GenericCast)->data.phonenumber, 21);
+            strcpy(cpf_cnpj, (atual->dataType == PESSOA_FISICA ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
 
             const char *at[] = {nome, endereco, telefone, cpf_cnpj};
 
@@ -843,7 +855,7 @@ void editarCliente(List *listaClientes)
                            wmove(subtelas[selecao - 1], 0, 0);
                            short check = lerSizeT(&idAlt, subtelas[selecao - 1]);
                            Node *repetido = findCByID(listaClientes, idAlt);
-                           if(repetido == atual && check == 1) goto cancelouID;
+                           if(repetido == atual && check == 1 || check == -3) goto cancelouID;
                            while(check != 1 || (repetido && repetido != atual))
                            {
                               cbreak();
@@ -863,7 +875,7 @@ void editarCliente(List *listaClientes)
                               check = lerSizeT(&idAlt, subtelas[selecao - 1]);
                               curs_set(FALSE);
                               repetido = findCByID(listaClientes, idAlt);
-                              if(repetido == atual && check == 1) goto cancelouID;
+                              if(repetido == atual && check == 1 || check == -3) goto cancelouID;
                            }
                         }
                         mudou = 1;
@@ -1117,11 +1129,11 @@ void editarCliente(List *listaClientes)
 
             if(!confirmar) goto reload;
 
-            get_content(atual, GenericCast)->data.id = idAlt;
-            strncpy(get_content(atual, GenericCast)->data.name, nome, 100);
-            strncpy(get_content(atual, GenericCast)->data.address, endereco, 200);
-            strncpy(get_content(atual, GenericCast)->data.phonenumber, telefone, 21);
-            strcpy((atual->dataType == PESSOA_FISICA ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj), cpf_cnpj);
+            expand_node(atual, GenericCast)->data.id = idAlt;
+            strncpy(expand_node(atual, GenericCast)->data.name, nome, 100);
+            strncpy(expand_node(atual, GenericCast)->data.address, endereco, 200);
+            strncpy(expand_node(atual, GenericCast)->data.phonenumber, telefone, 21);
+            strcpy((atual->dataType == PESSOA_FISICA ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj), cpf_cnpj);
 
             cortina(alter, 0, 0, ydadostam, 5);
             delwin(alter);
@@ -1165,6 +1177,7 @@ void editarCliente(List *listaClientes)
             werase(subselid);
             size_t targetID;
             short check = lerSizeT(&targetID, subselid);
+            if(check == -3) goto cancelouBusca;
             while(check != 1)
             {
                cbreak();
@@ -1180,6 +1193,7 @@ void editarCliente(List *listaClientes)
                wrefresh(subselid);
                wmove(subselid, 0, 0);
                check = lerSizeT(&targetID, subselid);
+               if(check == -3) goto cancelouBusca;
             }
 
             Node *tmp = findCByID(listaClientes, targetID);
@@ -1195,12 +1209,12 @@ void editarCliente(List *listaClientes)
                wmove(subselid, 0, 0);
                goto again;
             }
-
+            atual = tmp;
+            cancelouBusca:
             cortina(selid, 0, 0, 3, 5);
             delwin(subselid);
             delwin(selid);
 
-            atual = tmp;
             cbreak();
             noecho();
          }
@@ -1209,11 +1223,11 @@ void editarCliente(List *listaClientes)
       werase(subdados);
 
       mvwprintw(subdados, 0, 0, "ID: %zu\n\nNome: %s\n\nEndereço : %s\n\nTelefone: %s\n\nCPF/CNPJ: %s",
-                                 get_content(atual, GenericCast)->data.id,
-                                 get_content(atual, GenericCast)->data.name,
-                                 get_content(atual, GenericCast)->data.address,
-                                 get_content(atual, GenericCast)->data.phonenumber,
-                                 ((atual->dataType == PESSOA_FISICA) ? get_content(atual, PessoaFisica)->cpf : get_content(atual, PessoaJuridica)->cnpj));
+                                 expand_node(atual, GenericCast)->data.id,
+                                 expand_node(atual, GenericCast)->data.name,
+                                 expand_node(atual, GenericCast)->data.address,
+                                 expand_node(atual, GenericCast)->data.phonenumber,
+                                 ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
    
       wnoutrefresh(subdados);
       curs_set(FALSE);
@@ -1234,7 +1248,7 @@ Node* findCByID(List *lista, size_t targetID)
 {
    if(!lista->head) return NULL;
    
-   for(Node* begin = lista->head; begin; begin = begin->next) if(get_content(begin,GenericCast)->data.id == targetID) return begin;   
+   for(Node* begin = lista->head; begin; begin = begin->next) if(expand_node(begin,GenericCast)->data.id == targetID) return begin;   
 
    return NULL;
 }
@@ -1249,7 +1263,7 @@ Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj)
       {
          if(path->dataType == PESSOA_JURIDICA)
          {
-            if(strcmp(get_content(path, PessoaJuridica)->cnpj, cpf_cnpj) == 0) return path;
+            if(strcmp(expand_node(path, PessoaJuridica)->cnpj, cpf_cnpj) == 0) return path;
          }
       }
 
@@ -1260,7 +1274,7 @@ Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj)
    {
       if(path->dataType == PESSOA_FISICA)
       {
-         if(strcmp(get_content(path, PessoaFisica)->cpf, cpf_cnpj) == 0) return path;
+         if(strcmp(expand_node(path, PessoaFisica)->cpf, cpf_cnpj) == 0) return path;
       }
    }
 
@@ -1273,7 +1287,7 @@ int pathToCNode(List *lista, size_t targetID)
    
    int dist = 0;
    
-   for(Node* path = lista->head; path; path = path->next, dist++) if(get_content(path,GenericCast)->data.id == targetID) return dist;   
+   for(Node* path = lista->head; path; path = path->next, dist++) if(expand_node(path,GenericCast)->data.id == targetID) return dist;   
 
    return -1;
 }

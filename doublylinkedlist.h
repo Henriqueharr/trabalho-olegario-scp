@@ -4,10 +4,10 @@
 //Tipos de dados pretendidos para armazenamento em listas da SCP
 typedef enum Tipos {PESSOA_FISICA = 1, PESSOA_JURIDICA, PEDIDO, PRODUTO, ITEM_PEDIDO, NULO} Tipos;
 
-#define get_content(node,type) ((type*)(node->content))
+#define expand_node(node,type) ((type*)(node->content))
 
 //Essa é a estrutura de um nó para listas duplamente encadeadas
-//Use o macro get_content para acessar o conteúdo do nó rapidamente
+//Use o macro expand_node para acessar o conteúdo do nó rapidamente
 //
 // typedef struct Node 
 // {

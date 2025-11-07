@@ -64,6 +64,84 @@ void abrir(WINDOW *tela, unsigned short uppery, unsigned short abertura, unsigne
    curs_set(TRUE);
 }
 
+void subir(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay)
+{
+   curs_set(FALSE);
+   char buffer[QCarac + 1];
+   buffer[QCarac] = '\0';
+   for(short i = 0; i > -dist; i--)
+   {
+      for(short j = yi + i; j <= yf + i; j++)
+      {
+         mvwinnstr(tela, j, relx, buffer, QCarac);
+         mvwaddstr(tela, j - 1, relx, buffer);
+      }
+      wmove(tela, yf + i, relx);
+      wclrtoeol(tela);
+      wrefresh(tela);
+      napms(delay);
+   }
+   curs_set(TRUE);
+}
+
+void descer(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay)
+{
+   curs_set(FALSE);
+   char buffer[QCarac + 1];
+   buffer[QCarac] = '\0';
+   for(short i = 0; i < dist; i++)
+   {
+      for(short j = yf + i; j >= yi + i; j--)
+      {
+         mvwinnstr(tela, j, relx, buffer, QCarac);
+         mvwaddstr(tela, j + 1, relx, buffer);
+      }
+      wmove(tela, yi + i, relx);
+      wclrtoeol(tela);
+      wrefresh(tela);
+      napms(delay);
+   }
+   curs_set(TRUE);
+}
+
+void esquerda(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay)
+{
+   curs_set(FALSE);
+   char buffer[QCarac + 1];
+   buffer[QCarac] = '\0';
+   for(short i = relx; i > relx - dist; i--)
+   {
+      for(short j = yi; j <= yf; j++)
+      {
+         mvwinnstr(tela, j, i, buffer, QCarac);
+         wclrtoeol(tela);
+         mvwaddstr(tela, j, i - 1, buffer);
+      }
+      wrefresh(tela);
+      napms(delay);
+   }
+   curs_set(TRUE);
+}
+
+void direita(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay)
+{
+   curs_set(FALSE);
+   char buffer[QCarac + 1];
+   buffer[QCarac] = '\0';
+   for(short i = relx; i < relx + dist; i++)
+   {
+      for(short j = yi; j <= yf; j++)
+      {
+         mvwinnstr(tela, j, i, buffer, QCarac);
+         wclrtoeol(tela);
+         mvwaddstr(tela, j, i + 1, buffer);
+      }
+      wrefresh(tela);
+      napms(delay);
+   }
+   curs_set(TRUE);
+}
+
 void logo(unsigned short y, unsigned short x)
 {
    mvwaddstr(stdscr, y + 0, x, "███████╗ ██████╗██████╗");
@@ -117,7 +195,7 @@ void showMainMenu(MenuPrincipal *opc)
          goto fim;
          break;
          case KEY_UP: 
-         if(*opc > 1)
+         if(*opc > MENU_CLIENTES)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy--;
@@ -127,7 +205,7 @@ void showMainMenu(MenuPrincipal *opc)
          break;
 
          case KEY_DOWN:
-         if(*opc < 4)
+         if(*opc < ENCERRAR_PROGRAMA)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy++;
@@ -150,28 +228,26 @@ void showCustomerMenu(MenuCliente *opc)
 {
    unsigned short maxstdy, maxstdx;
    getmaxyx(stdscr, maxstdy, maxstdx);
-   werase(stdscr);
    
    curs_set(FALSE);
    noecho();
    cbreak();
+
+   unsigned short xpadrao = maxstdx * (95.0/teladevx), ypadrao = maxstdy * (20.0/teladevy);
+
    mvwaddstr(stdscr, 0, 1, "!Comandos!");
    mvwaddstr(stdscr, 1, 1, "Cima : Mover para cima");
    mvwaddstr(stdscr, 2, 1, "Baixo: Mover para baixo");
    mvwaddstr(stdscr, 3, 1, "Enter: Confirmar/Selecionar");
    mvwaddstr(stdscr, 4, 1, "Z/z  : Voltar");
 
-   unsigned short xpadrao = maxstdx * (95.0/teladevx), ypadrao = maxstdy * (20.0/teladevy);
-
    logo(ypadrao, xpadrao);
    mvwaddstr(stdscr,ypadrao + 7,xpadrao,"Selecione um opção: ");
-   mvwaddstr(stdscr,ypadrao + 9,xpadrao + 3,"Inserir cliente");
-   mvwaddstr(stdscr,ypadrao + 10,xpadrao + 3,"Listar clientes");
-   mvwaddstr(stdscr,ypadrao + 11,xpadrao + 3,"Editar cliente");
-   mvwaddstr(stdscr,ypadrao + 12,xpadrao + 3,"Remover cliente");
-   mvwaddstr(stdscr,ypadrao + 13,xpadrao + 3,"Salvar clientes em arquivo");
-   mvwaddstr(stdscr,ypadrao + 14,xpadrao + 3,"Carregar arquivo de clientes");
-   mvwaddstr(stdscr,ypadrao + 15,xpadrao + 3,"Voltar ao menu principal");
+   mvwaddstr(stdscr,ypadrao + 9,xpadrao + 3,"Inserir clientes");
+   mvwaddstr(stdscr,ypadrao + 10,xpadrao + 3,"Listar e consultar clientes");
+   mvwaddstr(stdscr,ypadrao + 11,xpadrao + 3,"Editar clientes");
+   mvwaddstr(stdscr,ypadrao + 12,xpadrao + 3,"Remover clientes");
+   mvwaddstr(stdscr,ypadrao + 13,xpadrao + 3,"Voltar ao menu principal");
    
    wrefresh(stdscr);
 
@@ -192,7 +268,7 @@ void showCustomerMenu(MenuCliente *opc)
          goto fim;
          break;
          case KEY_UP: 
-         if(*opc > 1)
+         if(*opc > ADD_CLIENTE)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy--;
@@ -202,7 +278,7 @@ void showCustomerMenu(MenuCliente *opc)
          break;
 
          case KEY_DOWN:
-         if(*opc < 7)
+         if(*opc < VOLTAR_CLIENTE)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy++;
@@ -255,7 +331,7 @@ void showAddCustomerMenu(Tipos *dataType)
          goto fim;
          break;
          case KEY_UP: 
-         if(*dataType > 1)
+         if(*dataType > PESSOA_FISICA)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy--;
@@ -265,7 +341,7 @@ void showAddCustomerMenu(Tipos *dataType)
          break;
 
          case KEY_DOWN:
-         if(*dataType < 2)
+         if(*dataType < PESSOA_JURIDICA)
          {
             mvwaddch(stdscr, stdy, xpadrao, ' ');
             stdy++;
@@ -278,6 +354,79 @@ void showAddCustomerMenu(Tipos *dataType)
       menuKey = wgetch(stdscr);
    }
    mvwaddch(stdscr, stdy, xpadrao, ' ');
+   fim:
+
+   keypad(stdscr, FALSE);
+   echo();
+   nocbreak();
+}
+
+void showMenuProduct(MenuProduto *opc)
+{
+   unsigned short maxstdy, maxstdx;
+   getmaxyx(stdscr, maxstdy, maxstdx);
+   
+   curs_set(FALSE);
+   noecho();
+   cbreak();
+
+   unsigned short xpadrao = maxstdx * (95.0/teladevx), ypadrao = maxstdy * (20.0/teladevy);
+
+   mvwaddstr(stdscr, 0, 1, "!Comandos!");
+   mvwaddstr(stdscr, 1, 1, "Cima : Mover para cima");
+   mvwaddstr(stdscr, 2, 1, "Baixo: Mover para baixo");
+   mvwaddstr(stdscr, 3, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 4, 1, "Z/z  : Voltar");
+
+   logo(ypadrao, xpadrao);
+   mvwaddstr(stdscr,ypadrao + 7,xpadrao,"Selecione um opção: ");
+   mvwaddstr(stdscr,ypadrao + 9,xpadrao + 3,"Inserir produtos");
+   mvwaddstr(stdscr,ypadrao + 10,xpadrao + 3,"Listar e consultar produtos");
+   mvwaddstr(stdscr,ypadrao + 11,xpadrao + 3,"Editar produtos");
+   mvwaddstr(stdscr,ypadrao + 12,xpadrao + 3,"Remover produtos");
+   mvwaddstr(stdscr,ypadrao + 13,xpadrao + 3,"Voltar ao menu principal");
+   
+   wrefresh(stdscr);
+
+   short menuKey = KEY_UP;
+   short stdy = ypadrao + 9;
+   *opc = ADD_PRODUTO;
+
+   mvwaddch(stdscr, stdy, xpadrao, '>');
+   keypad(stdscr, TRUE);
+
+   while(menuKey != '\n')
+   {
+      switch(menuKey)
+      {
+         case 'Z':
+         case 'z':
+         (*opc) = VOLTAR_PRODUTO;
+         goto fim;
+         break;
+         case KEY_UP: 
+         if(*opc > ADD_PRODUTO)
+         {
+            mvwaddch(stdscr, stdy, xpadrao, ' ');
+            stdy--;
+            mvwaddch(stdscr, stdy, xpadrao, '>');
+            (*opc)--;
+         }   
+         break;
+
+         case KEY_DOWN:
+         if(*opc < VOLTAR_PRODUTO)
+         {
+            mvwaddch(stdscr, stdy, xpadrao, ' ');
+            stdy++;
+            mvwaddch(stdscr, stdy, xpadrao, '>');
+            (*opc)++;
+         }
+         break;
+      }
+      wrefresh(stdscr);
+      menuKey = wgetch(stdscr);
+   }
    fim:
 
    keypad(stdscr, FALSE);

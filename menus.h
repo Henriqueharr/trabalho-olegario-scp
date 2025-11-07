@@ -28,8 +28,6 @@ typedef enum MenuCliente {ADD_CLIENTE = 1,
                           LISTAR_CLIENTES, 
                           EDITAR_CLIENTE, 
                           REMOVER_CLIENTE, 
-                          SALVAR_CLIENTES_CSV, 
-                          CARREGAR_CLIENTES_CSV, 
                           VOLTAR_CLIENTE} MenuCliente;
 
 //Enum para menu principal da aba produtos
@@ -45,8 +43,6 @@ typedef enum MenuProduto {ADD_PRODUTO = 1,
                           LISTAR_PRODUTOS, 
                           EDITAR_PRODUTO, 
                           REMOVER_PRODUTO, 
-                          SALVAR_PRODUTOS_CSV, 
-                          CARREGAR_PRODUTOS_CSV, 
                           VOLTAR_PRODUTO} MenuProduto;
 
 //Enum para menu principal da aba pedidos
@@ -60,8 +56,6 @@ typedef enum MenuProduto {ADD_PRODUTO = 1,
 typedef enum MenuPedido {ADD_PEDIDO = 1, 
                          LISTAR_PEDIDOS, 
                          DETALHAR_PEDIDO, 
-                         SALVAR_PEDIDOS_CSV, 
-                         CARREGAR_PEDIDOS_CSV, 
                          VOLTAR_PEDIDO} MenuPedido;
 
 //Enum para menu de criação de clientes
@@ -94,7 +88,7 @@ void gerarAviso(unsigned short altura, unsigned short largura, unsigned short yi
 //Escolha a janela, a altura inicial e até onde descerá, além da demora para executar
 void cortina(WINDOW * tela, unsigned short relx, short yi, short yf, unsigned short delay);
 
-//Mova todos os caracteres de um range de linhas para a esquerda
+//Mova todos os caracteres de um range de linhas para a esquerda, linha a linha
 //pad é quantas colunas para esquerda as linhas irão
 //relx é a coluna que irá atrair tudo que está a direita
 //As linhas se movem igualmente 
@@ -103,6 +97,14 @@ void slideLeft(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned sh
 //Transição no estilo de abertura a partir do centro com a demora escolhida
 //Se a qauntidade de linhas a abrir for impar, escolha a altura do meio para o inicio, e a altura imediatamente acima do centro caso contrário
 void abrir(WINDOW *tela, unsigned short uppery, unsigned short abertura, unsigned short delay);
+
+void subir(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay);
+
+void descer(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay);
+
+void esquerda(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay);
+
+void direita(WINDOW *tela, unsigned short relx, unsigned short yi, unsigned short yf, unsigned short QCarac, unsigned short dist, unsigned short delay);
 
 //Gera a logo da SCP a partir de na coordenada escolhida a partir de seu canto superior esquerdo
 //A logo tem 6 de altura por 24 de largura
@@ -116,5 +118,7 @@ void showCustomerMenu(MenuCliente *opc);
 
 //Seleção de tipo de cliente (por referência) com interface
 void showAddCustomerMenu(Tipos *dataType);
+
+void showMenuProduct(MenuProduto *opc);
 
 #endif
