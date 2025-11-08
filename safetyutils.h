@@ -3,6 +3,7 @@
 
 #include <ncurses.h>
 #include <stdbool.h>
+#include "doublylinkedlist.h"
 
 //Função que verifica se a string está vazia ou iniciada com um espaço
 short validarStr(const char *str);
@@ -30,6 +31,14 @@ short lerSizeT(size_t *valor, WINDOW *tela);
 //Deve ser especificado qual tela do ncurses está coletando o input
 short lerStr(char *str, size_t buffer, WINDOW *tela);
 
+//Essa função lê de forma segura variáveis do tipo double
+//Deve ser especificado qual tela do ncurses está coletando o input
+//Retorna 0 em caso de valor negativo
+//Retorna -1 caso sejam detectadas caracteres não numéricos no input
+//Retorna -2 caso não tenha entrada
+//Retorna 1 em leitura bem sucedida
+short lerDouble(WINDOW *tela, double *valor);
+
 //Essa função lê CPFs com formatação automática
 //Aviso: Para posterior validação, deve-se usar validar_cpf()
 //Deve ser especificado qual tela do ncurses está coletando o input
@@ -39,8 +48,6 @@ short lerCPF(char *str, WINDOW *tela);
 //Aviso: Para posterior validação, deve-se usar validar_cnpj()
 //Deve ser especificado qual tela do ncurses está coletando o input
 short lerCNPJ(char *str, WINDOW *tela);
-
-char* addChar(char *ptr, char c);
 
 char **split(char *str);
 

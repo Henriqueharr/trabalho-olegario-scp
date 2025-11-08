@@ -6,6 +6,7 @@
 #include "clientes.h"
 #include "safetyutils.h"
 #include "menus.h"
+#include "doublylinkedlist.h"
 
 extern double teladevy, teladevx;
 
@@ -21,11 +22,10 @@ short validarStr(const char *str)
 
 short lerSizeT(size_t *valor, WINDOW *tela)
 {
-   short y, x, maxy;
+   short y, x;
    short verificarLeitura = 0;
    long long intermediario;
    getyx(tela, y, x);
-   maxy = getmaxy(tela);
    verificarLeitura = mvwscanw(tela, y, x, "%lld", &intermediario);
 
    if(intermediario < 0) return 0; //valor negativo
@@ -43,6 +43,22 @@ short lerStr(char *str, size_t buffer, WINDOW *tela)
    getyx(tela, y, x);
    mvwgetnstr(tela, y, x, str, buffer - 1);
    return validarStr(str);
+}
+
+short lerDouble(WINDOW *tela, double *valor)
+{
+   unsigned short y, x;
+   getyx(tela, y, x);
+   double intermediario;
+   short check = mvwscanw(tela, y, x, "%lf", &intermediario);
+
+   if(intermediario < 0) return 0; //valor negativo
+   if(check == 0) return -1; //entrada inválida
+   if(check < 0) return -2; //entrada não encontrada
+   if(intermediario == 0) return -3; //Cancelou
+ 
+   *valor = intermediario;
+   return 1;
 }
 
 short lerCPF(char *str, WINDOW *tela)
@@ -292,14 +308,6 @@ bool todos_digitos_iguais(const char *str) {
       if (str[i] != str[0]) return 0;
    }
    return 1;
-}
-
-char* addChar(char *ptr, char c)
-{
-   ptr = (char*)realloc(ptr, (strlen(ptr) + 2) * sizeof(char));
-   *(ptr + strlen(ptr) + 1) = '\0';
-   *(ptr + strlen(ptr)) = c;
-   return ptr;
 }
 
 char **split(char *str)

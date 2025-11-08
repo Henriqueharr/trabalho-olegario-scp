@@ -45,10 +45,13 @@ void initList(List *lista);
 
 //Cria e insere um nó numa lista duplamente encadeada dada
 //Para mais informações em nós, consultar Node
-void createInsertNode(List *lista, void *conteudo, Tipos dataType);
+int createInsertNode(List *lista, void *conteudo, Tipos dataType);
 
 //Remove um nó de uma lista duplamente encadeada
 //O nó deve pertencer a lista passada, comportamento indefinido caso contrário
 void removeNode(List *lista, Node *target);
+
+//Função para achar o endereço na memória de um nó a partir de seu ID
+Node* findByID(List *lista, size_t targetID);
 
 #endif

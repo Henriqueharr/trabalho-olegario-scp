@@ -1,11 +1,12 @@
 #ifndef PRODUTOS_UTILS_H
 #define PRODUTOS_UTILS_H
 
+#include "doublylinkedlist.h"
+
 //Essa é a estrutura de um produto na SCP
 //
 // typedef struct Produto
 // {
-//    char name[100];
 //    size_t id;
 //    char description[150];
 //    double price;
@@ -13,11 +14,12 @@
 // } Produto;
 typedef struct Produto
 {
-   char name[100];
    size_t id;
    char description[150];
    double price;
    size_t stock;
 } Produto;
+
+Produto* criarProduto(List *listaProdutos);
 
 #endif

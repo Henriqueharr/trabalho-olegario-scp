@@ -2,6 +2,9 @@
 #include <ncurses.h>
 #include "vector.h"
 #include "doublylinkedlist.h"
+#include "clientes.h"
+#include "pedidos.h"
+#include "produtos.h"
              
 void initList(List *lista)
 {
@@ -10,9 +13,12 @@ void initList(List *lista)
    lista->tam = 0;
 }
 
-void createInsertNode(List *lista, void *conteudo, Tipos dataType)
+int createInsertNode(List *lista, void *conteudo, Tipos dataType)
 {
    Node *novo = (Node*)malloc(sizeof(Node));
+
+   if(!novo) return 0;
+
    novo->content = conteudo;
    novo->dataType = dataType;
    novo->next = NULL;
@@ -23,13 +29,15 @@ void createInsertNode(List *lista, void *conteudo, Tipos dataType)
       lista->head = novo;
       lista->tail = novo;
       lista->tam++;
-      return;
+      return 1;
    }
 
    lista->tail->next = novo;
    novo->prev = lista->tail;
    lista->tail = novo;
    lista->tam++;
+
+   return 1;
 }
 
 void removeNode(List *lista, Node *target)
@@ -68,4 +76,23 @@ void removeNode(List *lista, Node *target)
    lista->tam--;
    free(target->content);
    free(target);
+}
+
+Node* findByID(List *lista, size_t targetID)
+{
+   if(!lista->head) return NULL;
+
+   Node* begin = lista->head;
+   
+   if(begin->dataType == PESSOA_FISICA || begin->dataType == PESSOA_JURIDICA) for( ; begin; begin = begin->next) if(expand_node(begin,GenericCast)->data.id == targetID) return begin;   
+
+   begin = lista->head;
+
+   if(begin->dataType == PRODUTO) for( ; begin; begin = begin->next) if(expand_node(begin,Produto)->id == targetID) return begin;
+   
+   begin = lista->head;
+
+   if(begin->dataType == PEDIDO) for( ; begin; begin = begin->next) if(expand_node(begin,Pedido)->id == targetID) return begin;
+
+   return NULL;
 }

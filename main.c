@@ -30,6 +30,7 @@ int main()
    init_pair(1, COLOR_GREEN, COLOR_BLACK);
    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
    init_pair(3, COLOR_RED, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
 
    List LClientes, LPedidos, LProdutos;
    initList(&LClientes);
@@ -104,7 +105,14 @@ int main()
                         if(dataType != NULO)
                         {
                            void *novoCliente = criarCliente(dataType, &LClientes);
-                           if(novoCliente) createInsertNode(&LClientes, novoCliente, dataType);
+                           if(novoCliente) 
+                           {
+                              if(createInsertNode(&LClientes, novoCliente, dataType))
+                              {
+                                 //gerar aviso de operação bem sucedida
+                              }
+                              //else gerar aviso de erro
+                           }
                         }
                      }
                      slideLeft(stdscr, maxstdx * (75.0/teladevx), maxstdy * (21.0/teladevy), maxstdy * (21.0/teladevy) + 3, 30, 3);
@@ -128,8 +136,8 @@ int main()
                   break;
                   case REMOVER_CLIENTE:
                   {
-                     //IMPLEMENTAR DEPOIS  
                      subir(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 73, maxstdy * (18.0/teladevy), 15);
+                     //IMPLEMENTAR DEPOIS  
                   }
                   break;
                   case VOLTAR_CLIENTE:
@@ -139,7 +147,6 @@ int main()
                   }
                   break;
                }
-               wrefresh(stdscr);
             }
          }
          break;
@@ -150,6 +157,51 @@ int main()
             {
                showMenuProduct(&escolha);
                getmaxyx(stdscr, maxstdy, maxstdx);
+
+               switch(escolha)
+               {
+                  case ADD_PRODUTO:
+                  {
+                     void *novoProduto = &opc;
+                     cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
+                     slideLeft(stdscr, 0, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, maxstdx * (50.0/teladevx), 5);
+                     while(novoProduto)
+                     {
+                        novoProduto = criarProduto(&LProdutos); //Função fodástica de criar produto
+                        if(novoProduto) 
+                        {
+                           if(createInsertNode(&LProdutos, novoProduto, PRODUTO))
+                           {
+                              gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Produto salvo com sucesso");
+                           }
+                           //else gerar aviso de erro
+                        }
+                     }
+                     direita(stdscr, maxstdx * (95.0/teladevx) - maxstdx * (50.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdx * (50.0/teladevx), 10);
+                  }
+                  break;
+                  case LISTAR_PRODUTOS:
+                  {
+
+                  }
+                  break;
+                  case EDITAR_PRODUTO:
+                  {
+
+                  }
+                  break;
+                  case REMOVER_PRODUTO:
+                  {
+
+                  }
+                  break;
+                  case VOLTAR_PRODUTO:
+                  {
+                     descer(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 73, maxstdy * (9.0/teladevy), 15);
+                     subir(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy) + maxstdy * (9.0/teladevy), maxstdy * (20.0/teladevy) + 5 + maxstdy * (9.0/teladevy), 73, maxstdy * (9.0/teladevy), 15);
+                  }
+                  break;
+               }
             }
          }
          break;

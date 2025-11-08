@@ -73,6 +73,12 @@ typedef enum MenuCriarCliente{ID = 1,
                               CPF_CNPJ,
                               FINALIZAR} MenuCriarCliente;
 
+typedef enum MenuCriarProduto{IDPROD = 1,
+                              DESCRICAO,
+                              PRECO,
+                              ESTOQUE,
+                              FINALIZARPROD} MenuCriarProduto;
+
 //Função para geração de telas de erro personalizadas e que somem em 1 click!
 //Parâmetros:
 //Altura da tela de erro

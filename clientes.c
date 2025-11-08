@@ -31,11 +31,13 @@ void* criarCliente(Tipos dataType, List *lista)
    {
       telas[i] = newwin(y, x, (i + 1) * y, xpos);
       wborder(telas[i],  '|', '|', '-', '-', 'O', 'O', 'O', 'O');
-      waddstr(telas[i], label[i]);
+      wattron(telas[i], COLOR_PAIR(4));
+      mvwaddstr(telas[i], 0, 0, label[i]);
       if(dataType == PESSOA_JURIDICA && i == 4)
       {
          mvwaddstr(telas[i], 0, 0, label[5]);
       }
+      wattroff(telas[i], COLOR_PAIR(4));
       subtelas[i] = derwin(telas[i], y * (3.0/7.0), x - 4, y * (2.0/y), x * (2.0/x));
       wrefresh(telas[i]);
       napms(15);
@@ -105,7 +107,7 @@ void* criarCliente(Tipos dataType, List *lista)
                wmove(subtelas[opc - 1], 0, 0);
                short check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
                if(check == -3) goto pulouID;
-               Node* repetido = findCByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
+               Node* repetido = findByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
                while(check != 1 || repetido)
                {
                   cbreak();
@@ -125,7 +127,7 @@ void* criarCliente(Tipos dataType, List *lista)
                   check = lerSizeT(&get_ctype(novoCliente,GenericCast)->data.id, subtelas[opc - 1]);
                   if(check == -3) goto pulouID;
                   curs_set(FALSE);
-                  repetido = findCByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
+                  repetido = findByID(lista, get_ctype(novoCliente,GenericCast)->data.id);
 
                }
                werase(subtelas[opc - 1]);
@@ -297,26 +299,16 @@ void* criarCliente(Tipos dataType, List *lista)
          noecho();
          cbreak();
          tudofeito = 1;
-         for(unsigned short i = 0; i < 5; i++)
+         for(unsigned short i = 0; i < 5; i++) if(!preenchidos[i]) tudofeito = 0;
+         if(tudofeito)
          {
-            if(!preenchidos[i])
-            {
-               tudofeito = 0;
-            }
+            wattron(stdscr, COLOR_PAIR(1));
+            mvwaddstr(stdscr, btsalvar, xpos, "Salvar cliente");
+            wattroff(stdscr, COLOR_PAIR(1));
          }
          break;
       }
       curs_set(FALSE);
-
-      if(tudofeito)
-      {
-         unsigned short x, y;
-         getyx(stdscr, y, x);
-         attron(COLOR_PAIR(1));
-         mvwaddstr(stdscr, btsalvar, xpos, "Salvar cliente");
-         attroff(COLOR_PAIR(1));
-         wmove(stdscr, y, x);
-      }
       wrefresh(stdscr);
    }
 
@@ -736,11 +728,13 @@ void editarCliente(List *listaClientes)
             {
                telas[i] = newwin(y, x, (i + 1) * y, xpos);
                wborder(telas[i],  '|', '|', '-', '-', 'O', 'O', 'O', 'O');
+               wattron(telas[i], COLOR_PAIR(4));
                waddstr(telas[i], label[i]);
                if(atual->dataType == PESSOA_JURIDICA && i == 4)
                {
                   mvwaddstr(telas[i], 0, 0, label[5]);
                }
+               wattroff(telas[i], COLOR_PAIR(4));
                subtelas[i] = derwin(telas[i], y * (3.0/7.0), x - 4, y * (2.0/y), x * (2.0/x));
                if(i > 0)
                {
@@ -765,11 +759,13 @@ void editarCliente(List *listaClientes)
             for(short i = 0; i < 5; i++)
             {
                wborder(telas[i],  '|', '|', '-', '-', 'O', 'O', 'O', 'O');
+               wattron(telas[i], COLOR_PAIR(4));
                mvwaddstr(telas[i], 0, 0, label[i]);
                if(atual->dataType == PESSOA_JURIDICA && i == 4)
                {
                   mvwaddstr(telas[i], 0, 0, label[5]);
                }
+               wattroff(telas[i], COLOR_PAIR(4));
                switch(i)
                {
                   case 0:
@@ -854,7 +850,7 @@ void editarCliente(List *listaClientes)
                            wrefresh(subtelas[selecao - 1]);
                            wmove(subtelas[selecao - 1], 0, 0);
                            short check = lerSizeT(&idAlt, subtelas[selecao - 1]);
-                           Node *repetido = findCByID(listaClientes, idAlt);
+                           Node *repetido = findByID(listaClientes, idAlt);
                            if(repetido == atual && check == 1 || check == -3) goto cancelouID;
                            while(check != 1 || (repetido && repetido != atual))
                            {
@@ -874,7 +870,7 @@ void editarCliente(List *listaClientes)
                               wmove(subtelas[selecao - 1], 0, 0);
                               check = lerSizeT(&idAlt, subtelas[selecao - 1]);
                               curs_set(FALSE);
-                              repetido = findCByID(listaClientes, idAlt);
+                              repetido = findByID(listaClientes, idAlt);
                               if(repetido == atual && check == 1 || check == -3) goto cancelouID;
                            }
                         }
@@ -1196,7 +1192,7 @@ void editarCliente(List *listaClientes)
                if(check == -3) goto cancelouBusca;
             }
 
-            Node *tmp = findCByID(listaClientes, targetID);
+            Node *tmp = findByID(listaClientes, targetID);
 
             if(!tmp)
             {
@@ -1242,15 +1238,6 @@ void editarCliente(List *listaClientes)
    curs_set(FALSE);
    gerarAviso(maxstdy * (10.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (10.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Erro de carregamento", "A lista de clientes encontra-se vazia no momento");
    curs_set(TRUE);
-}
-
-Node* findCByID(List *lista, size_t targetID)
-{
-   if(!lista->head) return NULL;
-   
-   for(Node* begin = lista->head; begin; begin = begin->next) if(expand_node(begin,GenericCast)->data.id == targetID) return begin;   
-
-   return NULL;
 }
 
 Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj)
