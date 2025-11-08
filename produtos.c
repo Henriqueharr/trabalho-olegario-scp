@@ -29,7 +29,7 @@ Produto* criarProduto(List *listaProdutos)
    {
       telas[i] = newwin(tamabay, tamabax, ypos[i], xpos[i]);
       wborder(telas[i], '|', '|', '~', '~', 'O', 'O', 'O', 'O');
-      subtelas[i] = derwin(telas[i], tamabay * (11.0/tamabay), tamabax * (31.0/tamabax), tamabay * (2.0/tamabay), tamabax * (2.0/tamabax));
+      subtelas[i] = derwin(telas[i], tamabay * (11.0/15.0), tamabax * (31.0/35.0), tamabay * (2.0/15.0), tamabax * (2.0/35.0));
       wattron(telas[i], COLOR_PAIR(4));
       mvwaddstr(telas[i], 0, 0, label[i]);
       wattroff(telas[i], COLOR_PAIR(4));

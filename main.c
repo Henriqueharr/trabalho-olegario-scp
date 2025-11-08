@@ -136,7 +136,7 @@ int main()
                   break;
                   case REMOVER_CLIENTE:
                   {
-                     subir(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 73, maxstdy * (18.0/teladevy), 15);
+                     // subir(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 73, maxstdy * (18.0/teladevy), 15);
                      //IMPLEMENTAR DEPOIS  
                   }
                   break;
