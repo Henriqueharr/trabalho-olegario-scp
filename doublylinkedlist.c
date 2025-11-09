@@ -96,3 +96,24 @@ Node* findByID(List *lista, size_t targetID)
 
    return NULL;
 }
+
+int pathToCNode(List *lista, size_t targetID)
+{
+   if(!lista->head) return -1;
+
+   int dist = 0;
+   
+   Node* path = lista->head;
+   
+   if(path->dataType == PESSOA_FISICA || path->dataType == PESSOA_JURIDICA) for( ; path; path = path->next, dist++) if(expand_node(path,GenericCast)->data.id == targetID) return dist;   
+
+   path = lista->head;
+   
+   if(path->dataType == PRODUTO) for( ; path; path = path->next, dist++) if(expand_node(path,Produto)->id == targetID) return dist;
+
+   path = lista->head;
+   
+   if(path->dataType == PEDIDO) for( ; path; path = path->next, dist++) if(expand_node(path,Pedido)->id == targetID) return dist; 
+
+   return -1;
+}

@@ -39,37 +39,47 @@ int main()
 
    
    //Debug
-   // const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
-   // size_t last = 10123;
-   // for(size_t i = 123; i < last * 5; i++)
-   // {
-   //    short hmm = rand() % 8;
-   //    if(rand() % 2)
-   //    {
-   //       PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
-   //       if(conteudo)
-   //       {
-   //          conteudo->data.id = i;
-   //          strncpy(conteudo->data.name, seila[hmm], 100);
-   //          strncpy(conteudo->data.address, "Barra da Tijuca\0", 200);
-   //          strncpy(conteudo->data.phonenumber, "75983475\0", 20);
-   //          strncpy(conteudo->cpf, "000.000.000-00\0", 15);
-   //          createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
-   //       }
-   //       continue;
-   //    }
-   //    PessoaJuridica* conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
-   //    if(conteudo)
-   //    {
-   //       conteudo->data.id = i;
-   //       strncpy(conteudo->data.name, seila[hmm], 100);
-   //       strncpy(conteudo->data.address, "PlaceHolder\0", 200);
-   //       strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
-   //       strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
-   //       createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
-   //    }
+   size_t last = 10123;
+   const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
+   for(size_t i = 123; i < last * 5; i++)
+   {
+      short hmm = rand() % 8;
+      if(rand() % 2)
+      {
+         PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
+         if(conteudo)
+         {
+            conteudo->data.id = i;
+            strncpy(conteudo->data.name, seila[hmm], 100);
+            strncpy(conteudo->data.address, "Barra da Tijuca\0", 200);
+            strncpy(conteudo->data.phonenumber, "75983475\0", 20);
+            strncpy(conteudo->cpf, "000.000.000-00\0", 15);
+            createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
+         }
+         continue;
+      }
+      PessoaJuridica* conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
+      if(conteudo)
+      {
+         conteudo->data.id = i;
+         strncpy(conteudo->data.name, seila[hmm], 100);
+         strncpy(conteudo->data.address, "PlaceHolder\0", 200);
+         strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
+         strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
+         createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
+      }
       
-   // }
+   }
+
+   for(size_t i = 123; i < last * 5; i++)
+   {
+      Produto *novoProd = (Produto*)malloc(sizeof(Produto));
+      novoProd->id = i;
+      strncpy(novoProd->description, "Placeholder", 150);
+      novoProd->price = (i % 200) * (rand() % 5);
+      novoProd->stock = 75 + (rand() % 201); 
+      createInsertNode(&LProdutos, novoProd, PRODUTO);   
+   }
    //endDebug
 
    carregarDados(&LClientes, "clientes.csv");
@@ -182,7 +192,9 @@ int main()
                   break;
                   case LISTAR_PRODUTOS:
                   {
-
+                     abrir(stdscr, maxstdy * (20.0/teladevy) + 8, 29, 25);
+                     ListarProdutos(&LProdutos);
+                     cortina(stdscr, 0, 0, maxstdy, 10);
                   }
                   break;
                   case EDITAR_PRODUTO:

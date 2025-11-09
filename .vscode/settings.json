@@ -71,6 +71,7 @@
       "vector.h": "c",
       "ncurses.h": "c",
       "pedidos.h": "c",
-      "menus.h": "c"
+      "menus.h": "c",
+      "text_encoding": "c"
    }
 }

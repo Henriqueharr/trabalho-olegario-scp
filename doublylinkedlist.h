@@ -54,4 +54,6 @@ void removeNode(List *lista, Node *target);
 //Função para achar o endereço na memória de um nó a partir de seu ID
 Node* findByID(List *lista, size_t targetID);
 
+int pathToCNode(List *lista, size_t targetID);
+
 #endif

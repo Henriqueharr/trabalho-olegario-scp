@@ -72,7 +72,4 @@ void editarCliente(List *listaClientes);
 //Função para achar um nó pelo CPF ou CNPJ
 Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj);
 
-//Função que retorna a distância de um cliente até o começo da lista
-int pathToCNode(List *lista, size_t targetID);
-
 #endif

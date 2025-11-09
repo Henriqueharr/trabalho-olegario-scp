@@ -343,7 +343,7 @@ void listarClientes(List *listaClientes)
    cbreak();
    unsigned short maxstdy, maxstdx;
    getmaxyx(stdscr, maxstdy, maxstdx);
-   unsigned int n, cont;
+   unsigned int n;
    size_t ind = 0;
    (listaClientes->tam % 6 == 0 ? (n = listaClientes->tam / 6) : (n = listaClientes->tam / 6 + 1));
    
@@ -357,7 +357,7 @@ void listarClientes(List *listaClientes)
    
    Node *atual = listaClientes->head;
 
-   for(cont = 1; atual; atual = atual->next, cont++)
+   for(unsigned int cont = 1; atual; atual = atual->next, cont++)
    {
       if(cont % 6 == 1)
       {
@@ -365,9 +365,7 @@ void listarClientes(List *listaClientes)
          ind++;
       }
    }
-   ind = 1;
-   atual = pagina[0];
-
+   
    mvwaddstr(stdscr, 0, 1, "!Comandos!");
    mvwaddstr(stdscr, 1, 1, "Direita : Avançar página");
    mvwaddstr(stdscr, 2, 1, "Esquerda: Retroceder página");
@@ -375,11 +373,11 @@ void listarClientes(List *listaClientes)
    mvwaddstr(stdscr, 4, 1, "I/i     : Consultar por ID");
    mvwaddstr(stdscr, 5, 1, "Enter   : Confirmar");
    mvwaddstr(stdscr, 6, 1, "Z/z     : Voltar");
-
+   
    unsigned short yascii = maxstdy * (28.0/teladevy);
    unsigned short xascii1 = maxstdx * (2.0/teladevx);
    unsigned short xascii2 = maxstdx * (204.0/teladevx);
-
+   
    mvwaddstr(stdscr, yascii + 0, xascii1, "  ██╗");
    mvwaddstr(stdscr, yascii + 1, xascii1, " ██╔╝");
    mvwaddstr(stdscr, yascii + 2, xascii1, "██╔╝ ");
@@ -392,14 +390,12 @@ void listarClientes(List *listaClientes)
    mvwaddstr(stdscr, yascii + 3, xascii2, " ██╔╝");
    mvwaddstr(stdscr, yascii + 4, xascii2, "██╔╝ ");
    mvwaddstr(stdscr, yascii + 5, xascii2, "╚═╝  ");
-
+   
    wnoutrefresh(stdscr);
-
+   
    unsigned short yi = maxstdy * (15.0/teladevy), xi[] = {maxstdx * (15.0/teladevx), maxstdx * 0.5 - (maxstdx * (50.0/teladevx)) * 0.5, maxstdx * (146.0/teladevx)};
-
+   
    logo(maxstdy * (4.0/teladevy), maxstdx * 0.5 - 11);
-
-
    
    WINDOW *selecaoPagina = newwin(3, 19, yi - 3, xi[0]);
    WINDOW *subsel = derwin(selecaoPagina, 1, 8, 1, 1);
@@ -410,7 +406,7 @@ void listarClientes(List *listaClientes)
    
    WINDOW *telas[6];
    WINDOW *subtelas[6];
-
+   
    unsigned short ytamaba = yi;
    unsigned short xtamaba = maxstdx * (50.0/teladevx);
    
@@ -424,7 +420,9 @@ void listarClientes(List *listaClientes)
    }
    
    wnoutrefresh(stdscr);
-
+   
+   ind = 1;
+   atual = pagina[0];
 
    keypad(stdscr, TRUE);
    unsigned short cmd = KEY_LEFT;
@@ -1266,15 +1264,4 @@ Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj)
    }
 
    return NULL;
-}
-
-int pathToCNode(List *lista, size_t targetID)
-{
-   if(!lista->head) return -1;
-   
-   int dist = 0;
-   
-   for(Node* path = lista->head; path; path = path->next, dist++) if(expand_node(path,GenericCast)->data.id == targetID) return dist;   
-
-   return -1;
 }

@@ -22,4 +22,6 @@ typedef struct Produto
 
 Produto* criarProduto(List *listaProdutos);
 
+void ListarProdutos(List *listaProd);
+
 #endif

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <ncurses.h>
+#include <math.h>
 #include "safetyutils.h"
 #include "doublylinkedlist.h"
 #include "produtos.h"
@@ -112,7 +113,7 @@ Produto* criarProduto(List *listaProdutos)
          break;
          case KEY_RIGHT:
          {
-            if(!direita)
+            if(!direita && opc != FINALIZARPROD)
             {
                mvwaddch(stdscr, setaposy[baixo][direita], setaposx[baixo][direita], ' ');
                direita = !direita;
@@ -122,7 +123,7 @@ Produto* criarProduto(List *listaProdutos)
          break;
          case KEY_LEFT:
          {
-            if(direita)
+            if(direita && opc != FINALIZARPROD)
             {
                mvwaddch(stdscr, setaposy[baixo][direita], setaposx[baixo][direita], ' ');
                direita = !direita;
@@ -321,6 +322,321 @@ Produto* criarProduto(List *listaProdutos)
       delwin(subtelas[i]);
    }
 
+   free(novoProduto);
 
    return NULL;
+}
+
+void ListarProdutos(List *listaProd)
+{
+   unsigned short maxstdy, maxstdx;
+   getmaxyx(stdscr, maxstdy, maxstdx);
+
+   unsigned short ytamerro = maxstdy * (10.0/teladevy);
+   unsigned short xtamerro = maxstdx * (30.0/teladevx);
+   unsigned short yposerro = maxstdy * (2.0/teladevy);
+
+   unsigned int n;
+   size_t ind = 0;
+   (listaProd->tam % 6 == 0 ? (n = listaProd->tam / 6) : (n = listaProd->tam / 6 + 1));
+
+   Node *paginas[n];
+
+   if(!listaProd->head) goto listaVazia;
+
+   Node* atual = listaProd->head;
+
+   for(unsigned int cont = 1; atual; atual = atual->next, cont++)
+   {
+      if(cont % 6 == 1)
+      {
+         paginas[ind] = atual;
+         ind++;
+      }
+   }
+
+   mvwaddstr(stdscr, 0, 1, "!Comandos!");
+   mvwaddstr(stdscr, 1, 1, "Direita : Avançar página");
+   mvwaddstr(stdscr, 2, 1, "Esquerda: Retroceder página");
+   mvwaddstr(stdscr, 3, 1, "P/p     : Consultar por página");
+   mvwaddstr(stdscr, 4, 1, "I/i     : Consultar por ID");
+   mvwaddstr(stdscr, 5, 1, "Enter   : Confirmar");
+   mvwaddstr(stdscr, 6, 1, "Z/z     : Voltar");
+
+   unsigned short yascii = maxstdy * (28.0/teladevy);
+   unsigned short xascii1 = maxstdx * (2.0/teladevx);
+   unsigned short xascii2 = maxstdx * (204.0/teladevx);
+
+   mvwaddstr(stdscr, yascii + 0, xascii1, "  ██╗");
+   mvwaddstr(stdscr, yascii + 1, xascii1, " ██╔╝");
+   mvwaddstr(stdscr, yascii + 2, xascii1, "██╔╝ ");
+   mvwaddstr(stdscr, yascii + 3, xascii1, "╚██╗ ");
+   mvwaddstr(stdscr, yascii + 4, xascii1, " ╚██╗");
+   mvwaddstr(stdscr, yascii + 5, xascii1, "  ╚═╝");
+   mvwaddstr(stdscr, yascii + 0, xascii2, "██╗  ");
+   mvwaddstr(stdscr, yascii + 1, xascii2, "╚██╗ ");
+   mvwaddstr(stdscr, yascii + 2, xascii2, " ╚██╗");
+   mvwaddstr(stdscr, yascii + 3, xascii2, " ██╔╝");
+   mvwaddstr(stdscr, yascii + 4, xascii2, "██╔╝ ");
+   mvwaddstr(stdscr, yascii + 5, xascii2, "╚═╝  ");
+
+   wnoutrefresh(stdscr);
+
+   unsigned short yi = maxstdy * (15.0/teladevy), xi[] = {maxstdx * (15.0/teladevx), maxstdx * 0.5 - (maxstdx * (50.0/teladevx)) * 0.5, maxstdx * (146.0/teladevx)};
+
+   logo(maxstdy * (4.0/teladevy), maxstdx * 0.5 - 11);
+   
+   WINDOW *selecaoPagina = newwin(3, 19, yi - 3, xi[0]);
+   WINDOW *subsel = derwin(selecaoPagina, 1, 8, 1, 1);
+   wborder(selecaoPagina, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+   mvwaddstr(selecaoPagina, 0, 0, "Página");
+   mvwprintw(selecaoPagina, 1, 1, "        /%d", n);
+   wnoutrefresh(selecaoPagina);
+   
+   WINDOW *telas[6];
+   WINDOW *subtelas[6];
+
+   unsigned short ytamaba = yi;
+   unsigned short xtamaba = maxstdx * (50.0/teladevx);
+   
+   for(unsigned short i = 0; i < 6; i++)
+   {
+      telas[i] = newwin(ytamaba, xtamaba, yi, xi[i % 3]);
+      wborder(telas[i], '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+      subtelas[i] = derwin(telas[i], ytamaba - 2, xtamaba - 2, 1, 1);
+      wnoutrefresh(telas[i]);
+      if(i == 2) yi += (ytamaba + 2);
+   }
+   
+   wnoutrefresh(stdscr);
+
+   ind = 1;
+   atual = paginas[0];
+
+   cbreak();
+   noecho();
+   keypad(stdscr, TRUE);
+   unsigned short cmd = KEY_LEFT;
+   while(cmd != 'Z' && cmd != 'z')
+   {
+      switch(cmd)
+      {
+         case KEY_LEFT:
+         {
+            if(ind > 0)
+            {
+               ind--;
+               werase(subsel);
+               mvwprintw(subsel, 0, 0, "%zu", ind + 1);
+               wnoutrefresh(subsel);
+               atual = paginas[ind];
+               for(unsigned short i = 0; i < 6; i++)
+               {
+                  werase(subtelas[i]);
+                  wnoutrefresh(subtelas[i]);
+                  if(atual)
+                  {
+                     mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nDescrição: %s\n\nPreço: %.2lf\n\nEm estoque: %zu",
+                                                   expand_node(atual, Produto)->id,
+                                                   expand_node(atual, Produto)->description,
+                                                   expand_node(atual, Produto)->price,
+                                                   expand_node(atual, Produto)->stock);
+                     
+                     wnoutrefresh(subtelas[i]);
+                     atual = atual->next;
+                  }
+               }
+            }
+         }
+         break;
+         case KEY_RIGHT:
+         {
+            if(ind < n - 1)
+            {
+               ind++;
+               werase(subsel);
+               mvwprintw(subsel, 0, 0, "%zu", ind + 1);
+               wnoutrefresh(subsel);
+               atual = paginas[ind];
+               for(unsigned short i = 0; i < 6; i++)
+               {
+                  werase(subtelas[i]);
+                  wnoutrefresh(subtelas[i]);
+                  if(atual)
+                  {
+                     mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nDescrição: %s\n\nPreço: %.2lf\n\nEm estoque: %zu",
+                                                   expand_node(atual, Produto)->id,
+                                                   expand_node(atual, Produto)->description,
+                                                   expand_node(atual, Produto)->price,
+                                                   expand_node(atual, Produto)->stock);
+                                                   
+                     wnoutrefresh(subtelas[i]);
+                     atual = atual->next;
+                  }
+               }
+            }
+         }
+         break;
+         case 'P':
+         case 'p':
+         {
+            echo();
+            nocbreak();
+            curs_set(TRUE);
+            werase(subsel);
+            wrefresh(subsel);
+            wmove(subsel, 0, 0);
+            short check = lerSizeT(&ind, subsel);
+            while(check != 1 || ind > n || ind <= 0)
+            {
+               cbreak();
+               noecho();
+               curs_set(FALSE);
+               if(check == 0) 
+               {
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+                  goto duploerro;
+               }
+               if(check == -1) 
+               {
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+                  goto duploerro;
+               }
+               if(check == -2) 
+               {
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+                  goto duploerro;
+               }
+               if(ind > n || ind <= 0)
+               {
+                  gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "A página requisitada não existe");
+               }
+               duploerro:
+               werase(subsel);
+               wrefresh(subsel);
+               nocbreak();
+               echo();
+               curs_set(TRUE);
+               check = lerSizeT(&ind, subsel);
+            }
+            curs_set(FALSE);
+            cbreak();
+            noecho();
+            ind--;
+            werase(subsel);
+            mvwprintw(subsel, 0, 0, "%zu", ind + 1);
+            wnoutrefresh(subsel);
+            atual = paginas[ind];
+            for(unsigned short i = 0; i < 6; i++)
+            {
+               werase(subtelas[i]);
+               wnoutrefresh(subtelas[i]);
+               if(atual)
+               {
+                  mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nDescrição: %s\n\nPreço: %.2lf\n\nEm estoque: %zu",
+                                                expand_node(atual, Produto)->id,
+                                                expand_node(atual, Produto)->description,
+                                                expand_node(atual, Produto)->price,
+                                                expand_node(atual, Produto)->stock);
+                                                
+                  wnoutrefresh(subtelas[i]);
+                  atual = atual->next;
+               }
+            }
+         }
+         break;
+         case 'I':
+         case 'i':
+         {
+            WINDOW *selid = newwin(3, 25, ytamaba - 6, xi[0]);
+            WINDOW *subselid = derwin(selid, 1, 23, 1, 1);
+            wborder(selid, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+            mvwaddstr(selid, 0, 0, "Consultar ID");
+            wrefresh(selid);
+            echo();
+            nocbreak();
+            curs_set(TRUE);
+            wmove(subselid, 0, 0);
+            size_t targetID;
+            short check = lerSizeT(&targetID, subselid);
+            if(check == -3) goto cancelarID;
+            while(check != 1)
+            {
+               cbreak();
+               noecho();
+               curs_set(FALSE); 
+               if(check == 0) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+               if(check == -1) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+               if(check == -2) gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+               nocbreak();
+               echo();
+               curs_set(TRUE);
+               repetirID:
+               werase(subselid);
+               wrefresh(subselid);
+               wmove(subselid, 1, 3);
+               check = lerSizeT(&targetID, subselid);
+               if(check == -3) goto cancelarID;
+            }
+            int dist = pathToCNode(listaProd, targetID);
+            if(dist == -1)
+            {
+               cbreak();
+               noecho();
+               curs_set(FALSE);
+               gerarAviso(ytamerro, xtamerro, yposerro, xi[2] + (xtamaba - xtamerro) * 0.5, "||~~OOOO", "Erro de busca", "O identificador solicitado não existe");
+               nocbreak();
+               echo();
+               curs_set(TRUE);
+               goto repetirID;
+            }
+            ind = dist / 6;
+            werase(subsel);
+            mvwprintw(subsel, 0, 0, "%zu", ind + 1);
+            wnoutrefresh(subsel);
+            atual = paginas[ind];
+            for(unsigned short i = 0; i < 6; i++)
+            {
+               werase(subtelas[i]);
+               wnoutrefresh(subtelas[i]);
+               if(atual)
+               {
+                  if(expand_node(atual, Produto)->id == targetID) wattron(subtelas[i], COLOR_PAIR(1));
+                  mvwprintw(subtelas[i], 0, 0, "ID: %zu\n\nDescrição: %s\n\nPreço: %.2lf\n\nEm estoque: %zu",
+                                                expand_node(atual, Produto)->id,
+                                                expand_node(atual, Produto)->description,
+                                                expand_node(atual, Produto)->price,
+                                                expand_node(atual, Produto)->stock);
+                                                
+                  wnoutrefresh(subtelas[i]);
+                  wattroff(subtelas[i], COLOR_PAIR(1));
+                  atual = atual->next;
+               }
+            }
+            cancelarID:
+            cortina(selid, 0, 0, 3, 25);
+            delwin(subselid);
+            delwin(selid);
+            noecho();
+            cbreak();
+         }
+         break;
+      }
+      curs_set(FALSE);
+      doupdate();
+      cmd = wgetch(stdscr);
+   }
+
+   for(unsigned short i = 0; i < 6; i++)
+   {
+      abrir(telas[i], round(ytamaba * 0.5), round(ytamaba * 0.5), 10);
+      delwin(subtelas[i]);
+      delwin(telas[i]);
+   }
+
+   return;
+   listaVazia:
+   curs_set(FALSE);
+   gerarAviso(ytamerro, xtamerro, maxstdy * 0.5 - (ytamerro) * 0.5, maxstdx * 0.5 - (xtamerro) * 0.5, "||~~OOOO", "Erro de carregamento", "A lista de produtos encontra-se vazia no momento");
+   curs_set(TRUE);
 }
