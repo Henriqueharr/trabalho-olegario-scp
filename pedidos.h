@@ -2,6 +2,7 @@
 #define PEDIDOS_UTILS_H
 
 #include "vector.h"
+#include "doublylinkedlist.h"
 
 //Essa é a estrutura de um item de um pedido na SCP
 //
@@ -39,5 +40,7 @@ typedef struct Pedido
    double total;
    Vector itens;
 } Pedido;
+
+Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos);
 
 #endif

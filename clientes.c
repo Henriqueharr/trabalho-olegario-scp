@@ -38,7 +38,7 @@ void* criarCliente(Tipos dataType, List *lista)
          mvwaddstr(telas[i], 0, 0, label[5]);
       }
       wattroff(telas[i], COLOR_PAIR(4));
-      subtelas[i] = derwin(telas[i], y * (3.0/7.0), x - 4, y * (2.0/y), x * (2.0/x));
+      subtelas[i] = derwin(telas[i], y * (3.0/y), x - 4, y * (2.0/y), x * (2.0/x));
       wrefresh(telas[i]);
       napms(15);
    }
@@ -208,14 +208,15 @@ void* criarCliente(Tipos dataType, List *lista)
             break;
             case CPF_CNPJ:
             {
+               char cpf_cnpj[20];
                cbreak();
                cortina(subtelas[opc - 1], 0, 0, y * (3.0/7.0), 10);
                if(dataType == PESSOA_FISICA)
                {
                   wmove(subtelas[opc - 1], 0, 0);
                   keypad(subtelas[opc - 1], TRUE);
-                  short confirmou = lerCPF(get_ctype(novoCliente,PessoaFisica)->cpf, subtelas[opc - 1]);
-                  Node *repetido = findCByCPF_CNPJ(lista, get_ctype(novoCliente,PessoaFisica)->cpf);
+                  short confirmou = lerCPF(cpf_cnpj, subtelas[opc - 1]);
+                  Node *repetido = findCByCPF_CNPJ(lista, cpf_cnpj);
                   keypad(subtelas[opc - 1], FALSE);
                   if(!confirmou)
                   {
@@ -223,7 +224,7 @@ void* criarCliente(Tipos dataType, List *lista)
                      wrefresh(subtelas[opc - 1]);
                      goto skip;
                   }
-                  while(!validar_cpf(get_ctype(novoCliente,PessoaFisica)->cpf) || repetido)
+                  while(!validar_cpf(cpf_cnpj) || repetido)
                   {
                      cbreak();
                      noecho();
@@ -238,31 +239,24 @@ void* criarCliente(Tipos dataType, List *lista)
                      wmove(subtelas[opc - 1], 0, 0);
                      cbreak();
                      keypad(subtelas[opc - 1], TRUE);
-                     confirmou = lerCPF(get_ctype(novoCliente,PessoaFisica)->cpf, subtelas[opc - 1]);
-                     repetido = findCByCPF_CNPJ(lista, get_ctype(novoCliente,PessoaFisica)->cpf);
+                     confirmou = lerCPF(cpf_cnpj, subtelas[opc - 1]);
+                     repetido = findCByCPF_CNPJ(lista, cpf_cnpj);
                      keypad(subtelas[opc - 1], FALSE);
-                     if(!confirmou)
-                     {
-                        werase(subtelas[opc - 1]);
-                        wrefresh(subtelas[opc - 1]);
-                        goto skip;
-                     }
+                     if(!confirmou) goto skip;
                   }
+                  strncpy(get_ctype(novoCliente, PessoaFisica)->cpf, cpf_cnpj, 14);
+                  get_ctype(novoCliente, PessoaFisica)->cpf[14] = '\0';
                }
                else
                {
                   wmove(subtelas[opc - 1], 0, 0);
                   keypad(subtelas[opc - 1], TRUE);
-                  short confirmou = lerCNPJ(get_ctype(novoCliente,PessoaJuridica)->cnpj, subtelas[opc - 1]);
-                  Node *repetido = findCByCPF_CNPJ(lista, get_ctype(novoCliente,PessoaJuridica)->cnpj);
+                  short confirmou = lerCNPJ(cpf_cnpj, subtelas[opc - 1]);
+                  Node *repetido = findCByCPF_CNPJ(lista, cpf_cnpj);
                   keypad(subtelas[opc - 1], FALSE);
-                  if(!confirmou)
-                  {
-                     werase(subtelas[opc - 1]);
-                     wrefresh(subtelas[opc - 1]);
-                     goto skip;
-                  }
-                  while(!validar_cnpj(get_ctype(novoCliente,PessoaJuridica)->cnpj) || repetido)
+                  if(!confirmou) goto skip;
+
+                  while(!validar_cnpj(cpf_cnpj) || repetido)
                   {
                      cbreak();
                      noecho();
@@ -277,20 +271,21 @@ void* criarCliente(Tipos dataType, List *lista)
                      wmove(subtelas[opc - 1], 0, 0);
                      cbreak();
                      keypad(subtelas[opc - 1], TRUE);
-                     confirmou = lerCNPJ(get_ctype(novoCliente,PessoaJuridica)->cnpj, subtelas[opc - 1]);
-                     repetido = findCByCPF_CNPJ(lista, get_ctype(novoCliente,PessoaJuridica)->cnpj);
+                     confirmou = lerCNPJ(cpf_cnpj, subtelas[opc - 1]);
+                     repetido = findCByCPF_CNPJ(lista, cpf_cnpj);
                      keypad(subtelas[opc - 1], FALSE);
-                     if(!confirmou)
-                     {
-                        werase(subtelas[opc - 1]);
-                        wrefresh(subtelas[opc - 1]);
-                        goto skip;
-                     }
+                     if(!confirmou) goto skip;
                   }
+                  strncpy(get_ctype(novoCliente, PessoaJuridica)->cnpj, cpf_cnpj, 19);
+                  get_ctype(novoCliente, PessoaJuridica)->cnpj[19] = '\0';
                }
                preenchidos[opc - 1] = 1;
+               break;
+               skip:
+               werase(subtelas[opc - 1]);
+               if(preenchidos[opc - 1]) mvwaddstr(subtelas[opc - 1], 0, 0, (dataType == PESSOA_FISICA ? get_ctype(novoCliente, PessoaFisica)->cpf : get_ctype(novoCliente, PessoaJuridica)->cnpj));
+               wrefresh(subtelas[opc - 1]);
             }
-            skip:
             break;
             case FINALIZAR:
             preenchidos[opc - 1] = 1;

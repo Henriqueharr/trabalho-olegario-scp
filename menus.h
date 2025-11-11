@@ -55,7 +55,8 @@ typedef enum MenuProduto {ADD_PRODUTO = 1,
 //                          VOLTAR_PEDIDO} MenuPedido;
 typedef enum MenuPedido {ADD_PEDIDO = 1, 
                          LISTAR_PEDIDOS, 
-                         DETALHAR_PEDIDO, 
+                         EDITAR_PEDIDO,
+                         REMOVER_PEDIDO, 
                          VOLTAR_PEDIDO} MenuPedido;
 
 //Enum para menu de criação de clientes
@@ -73,11 +74,31 @@ typedef enum MenuCriarCliente{ID = 1,
                               CPF_CNPJ,
                               FINALIZAR} MenuCriarCliente;
 
+//Enum para menu de criação de produtos
+//
+// typedef enum MenuCriarProduto{IDPROD = 1,
+//                               DESCRICAO,
+//                               PRECO,
+//                               ESTOQUE,
+//                               FINALIZARPROD} MenuCriarProduto;
 typedef enum MenuCriarProduto{IDPROD = 1,
                               DESCRICAO,
                               PRECO,
                               ESTOQUE,
                               FINALIZARPROD} MenuCriarProduto;
+
+//Enum para menu de criação de pedidos
+//
+// typedef enum MenuCriarPedido{IDPEDIDO,
+//                              ESCOLHER_CLIENTE,
+//                              DATA,
+//                              ESCOLHER_PRODUTO,
+//                              FINALIZAR_PEDIDO}MenuCriarPedido;
+typedef enum MenuCriarPedido{IDPEDIDO = 1,
+                             DATA,
+                             ESCOLHER_CLIENTE,
+                             ESCOLHER_PRODUTO,
+                             FINALIZAR_PEDIDO}MenuCriarPedido;
 
 //Função para geração de telas de erro personalizadas e que somem em 1 click!
 //Parâmetros:
@@ -126,5 +147,7 @@ void showCustomerMenu(MenuCliente *opc);
 void showAddCustomerMenu(Tipos *dataType);
 
 void showMenuProduct(MenuProduto *opc);
+
+void showMenuRequest(MenuPedido *opc);
 
 #endif

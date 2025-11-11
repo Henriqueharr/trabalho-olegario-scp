@@ -311,6 +311,8 @@ Produto* criarProduto(List *listaProdutos)
       delwin(subtelas[i]);
    }
 
+   cortina(stdscr, 0, maxstdy * (44.0/teladevy) - 1, maxstdy * (44.0/teladevy) + 1, 1);
+
    return novoProduto;
 
    escape:
@@ -321,6 +323,8 @@ Produto* criarProduto(List *listaProdutos)
       delwin(telas[i]);
       delwin(subtelas[i]);
    }
+
+   cortina(stdscr, 0, maxstdy * (44.0/teladevy) - 1, maxstdy * (44.0/teladevy) + 1, 1);
 
    free(novoProduto);
 

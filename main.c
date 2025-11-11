@@ -40,36 +40,36 @@ int main()
    
    //Debug
    size_t last = 10123;
-   const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
-   for(size_t i = 123; i < last * 5; i++)
-   {
-      short hmm = rand() % 8;
-      if(rand() % 2)
-      {
-         PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
-         if(conteudo)
-         {
-            conteudo->data.id = i;
-            strncpy(conteudo->data.name, seila[hmm], 100);
-            strncpy(conteudo->data.address, "Barra da Tijuca\0", 200);
-            strncpy(conteudo->data.phonenumber, "75983475\0", 20);
-            strncpy(conteudo->cpf, "000.000.000-00\0", 15);
-            createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
-         }
-         continue;
-      }
-      PessoaJuridica* conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
-      if(conteudo)
-      {
-         conteudo->data.id = i;
-         strncpy(conteudo->data.name, seila[hmm], 100);
-         strncpy(conteudo->data.address, "PlaceHolder\0", 200);
-         strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
-         strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
-         createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
-      }
+   // const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
+   // for(size_t i = 123; i < last * 5; i++)
+   // {
+   //    short hmm = rand() % 8;
+   //    if(rand() % 2)
+   //    {
+   //       PessoaFisica* conteudo = (PessoaFisica*)malloc(sizeof(PessoaFisica));
+   //       if(conteudo)
+   //       {
+   //          conteudo->data.id = i;
+   //          strncpy(conteudo->data.name, seila[hmm], 100);
+   //          strncpy(conteudo->data.address, "Barra da Tijuca\0", 200);
+   //          strncpy(conteudo->data.phonenumber, "75983475\0", 20);
+   //          strncpy(conteudo->cpf, "000.000.000-00\0", 15);
+   //          createInsertNode(&LClientes, conteudo, PESSOA_FISICA);
+   //       }
+   //       continue;
+   //    }
+   //    PessoaJuridica* conteudo = (PessoaJuridica*)malloc(sizeof(PessoaJuridica));
+   //    if(conteudo)
+   //    {
+   //       conteudo->data.id = i;
+   //       strncpy(conteudo->data.name, seila[hmm], 100);
+   //       strncpy(conteudo->data.address, "PlaceHolder\0", 200);
+   //       strncpy(conteudo->data.phonenumber, "PlaceHolder\0", 20);
+   //       strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
+   //       createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
+   //    }
       
-   }
+   // }
 
    for(size_t i = 123; i < last * 5; i++)
    {
@@ -218,7 +218,60 @@ int main()
          }
          break;
          case MENU_PEDIDOS:
-         mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Pedidos selecionados\n");
+         {
+            MenuPedido escolha = ADD_PEDIDO;
+            while(escolha != VOLTAR_PEDIDO)
+            {
+               showMenuRequest(&escolha);
+               getmaxyx(stdscr, maxstdy, maxstdx);
+
+               switch(escolha)
+               {
+                  case ADD_PEDIDO:
+                  {
+                     void *novoPedido = &escolha;
+                     cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
+                     abrir(stdscr, maxstdy * (20.0/teladevy) + 2, 4, 75);
+                     // esquerda(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdx * 0.45, 5);
+                     // descer(stdscr, maxstdx * (95.0/teladevx) - maxstdx * 0.45, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdy * 0.475, 5);
+                     while(novoPedido)
+                     {
+                        novoPedido = criarPedido(&LPedidos, &LClientes, &LProdutos); //Função fodástica de criar produto
+                        if(novoPedido) 
+                        {
+                           if(createInsertNode(&LPedidos, novoPedido, PEDIDO))
+                           {
+                              gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Produto salvo com sucesso");
+                           }
+                           //else gerar aviso de erro
+                        }
+                     }
+                  }
+                  break;
+                  case LISTAR_PEDIDOS:
+                  {
+
+                  }
+                  break;
+                  case EDITAR_PEDIDO:
+                  {
+
+                  }
+                  break;
+                  case REMOVER_PEDIDO:
+                  {
+
+                  }
+                  break;
+                  case VOLTAR_PEDIDO:
+                  {
+                     descer(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 73, maxstdy * (9.0/teladevy), 15);
+                     subir(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy) + maxstdy * (9.0/teladevy), maxstdy * (20.0/teladevy) + 5 + maxstdy * (9.0/teladevy), 73, maxstdy * (9.0/teladevy), 15);
+                  }
+                  break;
+               }
+            }
+         }
          break;
          case ENCERRAR_PROGRAMA:
          mvwaddstr(stdscr, maxstdy * (33.0/teladevy), maxstdx * (95.0/teladevx), "Encerrando programa\n");

@@ -433,3 +433,76 @@ void showMenuProduct(MenuProduto *opc)
    echo();
    nocbreak();
 }
+
+void showMenuRequest(MenuPedido *opc)
+{
+   unsigned short maxstdy, maxstdx;
+   getmaxyx(stdscr, maxstdy, maxstdx);
+   
+   curs_set(FALSE);
+   noecho();
+   cbreak();
+
+   unsigned short xpadrao = maxstdx * (95.0/teladevx), ypadrao = maxstdy * (20.0/teladevy);
+
+   mvwaddstr(stdscr, 0, 1, "!Comandos!");
+   mvwaddstr(stdscr, 1, 1, "Cima : Mover para cima");
+   mvwaddstr(stdscr, 2, 1, "Baixo: Mover para baixo");
+   mvwaddstr(stdscr, 3, 1, "Enter: Confirmar/Selecionar");
+   mvwaddstr(stdscr, 4, 1, "Z/z  : Voltar");
+
+   logo(ypadrao, xpadrao);
+   mvwaddstr(stdscr,ypadrao + 7,xpadrao,"Selecione um opção: ");
+   mvwaddstr(stdscr,ypadrao + 9,xpadrao + 3,"Inserir pedidos");
+   mvwaddstr(stdscr,ypadrao + 10,xpadrao + 3,"Listar e consultar pedidos");
+   mvwaddstr(stdscr,ypadrao + 11,xpadrao + 3,"Editar pedidos");
+   mvwaddstr(stdscr,ypadrao + 12,xpadrao + 3,"Remover pedidos");
+   mvwaddstr(stdscr,ypadrao + 13,xpadrao + 3,"Voltar ao menu principal");
+   
+   wrefresh(stdscr);
+
+   short menuKey = KEY_UP;
+   short stdy = ypadrao + 9;
+   *opc = ADD_PEDIDO;
+
+   mvwaddch(stdscr, stdy, xpadrao, '>');
+   keypad(stdscr, TRUE);
+
+   while(menuKey != '\n')
+   {
+      switch(menuKey)
+      {
+         case 'Z':
+         case 'z':
+         (*opc) = VOLTAR_PEDIDO;
+         goto fim;
+         break;
+         case KEY_UP: 
+         if(*opc > ADD_PEDIDO)
+         {
+            mvwaddch(stdscr, stdy, xpadrao, ' ');
+            stdy--;
+            mvwaddch(stdscr, stdy, xpadrao, '>');
+            (*opc)--;
+         }   
+         break;
+
+         case KEY_DOWN:
+         if(*opc < VOLTAR_PEDIDO)
+         {
+            mvwaddch(stdscr, stdy, xpadrao, ' ');
+            stdy++;
+            mvwaddch(stdscr, stdy, xpadrao, '>');
+            (*opc)++;
+         }
+         break;
+      }
+      wrefresh(stdscr);
+      menuKey = wgetch(stdscr);
+   }
+   fim:
+
+   keypad(stdscr, FALSE);
+   echo();
+   nocbreak();
+}
