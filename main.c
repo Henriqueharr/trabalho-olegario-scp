@@ -76,7 +76,7 @@ int main()
       Produto *novoProd = (Produto*)malloc(sizeof(Produto));
       novoProd->id = i;
       strncpy(novoProd->description, "Placeholder", 150);
-      novoProd->price = (i % 200) * (rand() % 5);
+      novoProd->price = 25 + (i % 200) * (rand() % 5) + (rand() % 100)/100.0;
       novoProd->stock = 75 + (rand() % 201); 
       createInsertNode(&LProdutos, novoProd, PRODUTO);   
    }
@@ -250,7 +250,9 @@ int main()
                   break;
                   case LISTAR_PEDIDOS:
                   {
-
+                     abrir(stdscr, maxstdy * (20.0/teladevy) + 8, 29, 25);
+                     ListarPedidos(&LPedidos);
+                     cortina(stdscr, 0, 0, maxstdy, 10);
                   }
                   break;
                   case EDITAR_PEDIDO:

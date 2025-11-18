@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
+#include <math.h>
+#include <string.h>
 #include "doublylinkedlist.h"
 #include "produtos.h"
 #include "pedidos.h"
@@ -13,6 +15,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
 {
    unsigned short maxstdy, maxstdx;
    getmaxyx(stdscr, maxstdy, maxstdx);
+   unsigned short dist = maxstdy * (8.0/teladevy);
 
    const char* label[] = {"ID", "Data", "ID do Cliente", "Produtos do pedido", "Total do pedido"};
    const char* otalabel[] = {"Cliente", "Produto"};
@@ -24,10 +27,10 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                             maxstdx * (36.0/teladevx) + maxstdx * (32.0/teladevx)};
 
    unsigned short posy[] = {maxstdy * (10.0/teladevy), 
-                            maxstdy * (10.0/teladevy) + maxstdy * (8.0/teladevy), 
-                            maxstdy * (10.0/teladevy) + maxstdy * (16.0/teladevy), 
+                            maxstdy * (10.0/teladevy) + dist + 1, 
+                            maxstdy * (10.0/teladevy) + dist * 2 + 2, 
                             maxstdy * (10.0/teladevy),
-                            maxstdy * (10.0/teladevy) + maxstdy * (24.0/teladevy)};
+                            maxstdy * (10.0/teladevy) + dist * 3 + 2};
    
    unsigned short tamabay[] = {maxstdy * (7.0/teladevy), 
                                maxstdy * (7.0/teladevy), 
@@ -53,6 +56,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                    41.0,
                    41.0};
 
+   
    unsigned short xtamerro = maxstdx * (33.0/teladevx);
    unsigned short ytamerro = maxstdy * (23.0/teladevy);
    unsigned short xposerro = maxstdx * (1.0/teladevx);
@@ -76,13 +80,13 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
    initVector(&novoPedido->itens);
    novoPedido->id = 0;
 
-   unsigned short setapos = posy[0] + tamabay[0] * 0.5 + maxstdy * (8.0/teladevy);
+   unsigned short setapos = posy[0] + round(tamabay[0] * 0.5) + dist;
    unsigned short cmd = KEY_UP;
    MenuCriarPedido opc = DATA;
    unsigned short preenchidos[5] = {};
    unsigned short tudofeito = 0;
 
-   mvwaddstr(stdscr, posy[0] + tamabay[0] * 0.5 + maxstdy * (8.0/teladevy) * 3, posx[0], "Adicionar produtos");
+   mvwaddstr(stdscr, posy[0] + tamabay[0] * 0.5 + dist * 3 + 3, posx[0], "Adicionar produtos");
    
    keypad(stdscr, TRUE);
    curs_set(FALSE);
@@ -99,10 +103,18 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
          break;
          case KEY_UP:
          {
+            if(opc == FINALIZAR_PEDIDO)
+            {
+               mvwaddch(stdscr, setapos, posx[0] - 2, ' ');
+               setapos -= 3;
+               mvwaddch(stdscr, setapos, posx[0] - 2, '>');
+               opc--;
+               break;
+            }
             if(opc > IDPEDIDO)
             {
                mvwaddch(stdscr, setapos, posx[0] - 2, ' ');
-               setapos -= maxstdy * (8.0/teladevy);
+               setapos -= (dist + 1);
                mvwaddch(stdscr, setapos, posx[0] - 2, '>');
                opc--;
             }
@@ -110,10 +122,18 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
          break;
          case KEY_DOWN:
          {
-            if(opc < ESCOLHER_PRODUTO || (opc == ESCOLHER_PRODUTO && tudofeito))
+            if(opc == ESCOLHER_PRODUTO && tudofeito)
             {
                mvwaddch(stdscr, setapos, posx[0] - 2, ' ');
-               setapos += maxstdy * (8.0/teladevy);
+               setapos += 3;
+               mvwaddch(stdscr, setapos, posx[0] - 2, '>');
+               opc++;
+               break;
+            }
+            if(opc < ESCOLHER_PRODUTO)
+            {
+               mvwaddch(stdscr, setapos, posx[0] - 2, ' ');
+               setapos += (dist + 1);
                mvwaddch(stdscr, setapos, posx[0] - 2, '>');
                opc++;
             }
@@ -140,7 +160,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                   if(check == 0) {gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos"); goto erroDuplo;}
                   if(check == -1) {gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos"); goto erroDuplo;}
                   if(check == -2) {gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Entrada não encontrada"); goto erroDuplo;}
-                  if(repetido) gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este ID de cliente já existe");
+                  if(repetido) gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este ID de pedido já existe");
                   erroDuplo:
                   nocbreak();
                   echo();
@@ -152,7 +172,6 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                   if(check == -3) goto pulouID;
                   curs_set(FALSE);
                   repetido = findByID(listaPedidos, novoPedido->id);
-
                }
                werase(subtelas[opc - 1]);
                mvwprintw(subtelas[opc - 1], 0, 0, "%zu", novoPedido->id);
@@ -167,18 +186,24 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
             break;
             case DATA:
             {
-
+               char data[15];
+               cbreak();
+               werase(subtelas[opc - 1]);
+               wmove(subtelas[opc - 1], 0, 0);
+               keypad(subtelas[opc - 1], TRUE);
+               short confirmou = lerData(data, subtelas[opc - 1]);
+               if(!confirmou) goto pulouData;
+               strcpy(novoPedido->date, data);
+               preenchidos[opc - 1] = 1;
             }
+            break;
+            pulouData:
+            werase(subtelas[opc - 1]);
+            if(preenchidos[opc - 1]) mvwaddstr(subtelas[opc - 1], 0, 0, novoPedido->date);
+            wrefresh(subtelas[opc - 1]);
             break;
             case ESCOLHER_CLIENTE:
             {
-               if(!listaClientes->head)
-               {
-                  //gerarAviso
-                  break;
-               }
-               // y 18
-               // x 39
                WINDOW *cliente = newwin(maxstdy * (18.0/teladevy), maxstdx * (39.0/teladevx), posy[0], maxstdx * (148.0/teladevx));
                WINDOW *subcliente = derwin(cliente, maxstdy * (18.0/teladevy) * (16.0/18.0), maxstdx * (39.0/teladevx) * (37.0/39.0), 1, 1);
                wborder(cliente, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
@@ -220,7 +245,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                      case 'I':
                      case 'i':
                      {
-                        WINDOW *selid = newwin(maxstdy * (5.0/teladevy), maxstdx * (37.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
+                        WINDOW *selid = newwin(maxstdy * (5.0/teladevy), maxstdx * (39.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
                         WINDOW *subselid = derwin(selid,maxstdy * (5.0/teladevy) * (3.0/5.0), maxstdx * (37.0/teladevx) * (37.0/39.0), 1, 1);
                         wborder(selid, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
                         mvwaddstr(selid, 0, 0, "Consultar ID");
@@ -298,6 +323,12 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
             break;
             case ESCOLHER_PRODUTO:
             {
+               if(novoPedido->id == 0)
+               {
+                  gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de preenchimento", "Não há como adicionar produtos sem incluir um ID ao pedido antes");
+                  break;
+               }
+
                WINDOW *produto = newwin(maxstdy * (18.0/teladevy), maxstdx * (39.0/teladevx), posy[0], maxstdx * (148.0/teladevx));
                WINDOW *subproduto = derwin(produto, maxstdy * (18.0/teladevy) * (16.0/18.0), maxstdx * (39.0/teladevx) * (37.0/39.0), 1, 1);
                wborder(produto, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
@@ -332,17 +363,60 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                         }
                      }
                      break;
+                     case 'i':
+                     case 'I':
+                     {
+                        WINDOW *selid = newwin(maxstdy * (5.0/teladevy), maxstdx * (39.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
+                        WINDOW *subselid = derwin(selid,maxstdy * (5.0/teladevy) * (3.0/5.0), maxstdx * (37.0/teladevx) * (37.0/39.0), 1, 1);
+                        wborder(selid, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+                        mvwaddstr(selid, 0, 0, "Consultar ID");
+                        wrefresh(selid);
+                        echo();
+                        nocbreak();
+                        curs_set(TRUE);
+                        wmove(subselid, 1, 1);
+                        size_t targetID;
+                        short check = lerSizeT(&targetID, subselid);
+                        if(check == -3) goto cancelarIDProd;
+                        while(check != 1)
+                        {
+                           cbreak();
+                           noecho();
+                           curs_set(FALSE); 
+                           if(check == 0) gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este campo não aceita valores negativos");
+                           if(check == -1) gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Este campo não aceita caracteres não numéricos");
+                           if(check == -2) gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de validação", "Entrada não encontrada");
+                           repetirIDProd:
+                           nocbreak();
+                           echo();
+                           curs_set(TRUE);
+                           werase(subselid);
+                           wrefresh(subselid);
+                           wmove(subselid, 1, 1);
+                           check = lerSizeT(&targetID, subselid);
+                           if(check == -3) goto cancelarIDProd;
+                        }
+                        Node* tmp = findByID(listaProdutos, targetID);
+                        if(!tmp)
+                        {
+                           cbreak();
+                           noecho();
+                           curs_set(FALSE);
+                           gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de busca", "O identificador solicitado não existe");
+                           goto repetirIDProd;
+                        }
+                        atual = tmp;
+                        cancelarIDProd:
+                        cortina(selid, 0, 0, maxstdy * (5.0/teladevy), 10);
+                        delwin(subselid);
+                        delwin(selid);
+                     }
+                     break;
                      case '\n':
                      {
-                        if(novoPedido->id == 0)
-                        {
-                           // gerarAviso
-                           break;
-                        }
-
                         if(expand_node(atual, Produto)->stock == 0)
                         {
-                           // gerarAviso
+                           gerarAviso(ytamerro, xtamerro, yposerro, xposerro, "||~~OOOO", "Erro de requisição", "Este produto não está mais disponível");
                            break;
                         }
 
@@ -360,7 +434,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                         novoItem->productId = expand_node(atual, Produto)->id;
 
                         {
-                           WINDOW *quantidade = newwin(maxstdy * (5.0/teladevy), maxstdx * (37.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
+                           WINDOW *quantidade = newwin(maxstdy * (5.0/teladevy), maxstdx * (39.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
                            WINDOW *subquantidade = derwin(quantidade,maxstdy * (5.0/teladevy) * (3.0/5.0), maxstdx * (37.0/teladevx) * (37.0/39.0), 1, 1);
                            wborder(quantidade, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
                            mvwaddstr(quantidade, 0, 0, "Adicionar quantidade");
@@ -413,7 +487,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                         break;
                         itemRepetido:
                         size_t quant = 0;
-                        WINDOW *quantidade = newwin(maxstdy * (5.0/teladevy), maxstdx * (37.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
+                        WINDOW *quantidade = newwin(maxstdy * (5.0/teladevy), maxstdx * (39.0/teladevx), posy[0] + maxstdy * (18.0/teladevy), maxstdx * (148.0/teladevx));
                         WINDOW *subquantidade = derwin(quantidade,maxstdy * (5.0/teladevy) * (3.0/5.0), maxstdx * (37.0/teladevx) * (37.0/39.0), 1, 1);
                         wborder(quantidade, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
                         mvwaddstr(quantidade, 0, 0, "Adicionar quantidade");
@@ -463,6 +537,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                         break;
                      }
                   }
+                  werase(subproduto);
                   mvwprintw(subproduto, 0, 0, "ID: %zu\n\nDescrição: %s\n\nPreço: %.2lf\n\nEm estoque: %zu",
                                                    expand_node(atual, Produto)->id,
                                                    expand_node(atual, Produto)->description,
@@ -475,20 +550,27 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
                   noecho();
                   werase(subtelas[3]);
                   wmove(subtelas[3], 0, 0);
+                  double soma = 0;
                   for(unsigned short i = 0; i < novoPedido->itens._size; i++)
                   {
-                     wprintw(subtelas[3], "Produto: %zu - Quantidade: %zu\nSubtotal %.2lf\n", 
+                     
+                     soma += access_index(novoPedido->itens, ItemPedido, i).subtotal;
+                     wprintw(subtelas[3], "Produto: %zu - Quantidade: %zu\nSubtotal: R$ %.2lf\n", 
                         access_index(novoPedido->itens, ItemPedido, i).productId,
                         access_index(novoPedido->itens, ItemPedido, i).amount,
                         access_index(novoPedido->itens, ItemPedido, i).subtotal);
                   }
-                  wrefresh(subtelas[3]);
+                  mvwprintw(subtelas[4], (tamabay[4] * (refy[4]/tamabay[4])) * 0.5 - 1, 3, "R$ %.2lf", soma);
+                  wnoutrefresh(subtelas[3]);
+                  wnoutrefresh(subtelas[4]);
+                  doupdate();
                   cmd = wgetch(stdscr);
                }
                cortina(produto, 0, 0, maxstdy * (18.0/teladevy), 10);
                delwin(subproduto);
                delwin(produto);
             }
+            if(novoPedido->itens._size != 0) preenchidos[opc - 1] = 1;
             break;
             case FINALIZAR_PEDIDO:
             preenchidos[opc - 1] = 1;
@@ -499,7 +581,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
          if(tudofeito)
          {
             wattron(stdscr, COLOR_PAIR(1));
-            mvwaddstr(stdscr, posy[0] + tamabay[0] * 0.5 + maxstdy * (8.0/teladevy) * 4, posx[0], "Salvar pedido");
+            mvwaddstr(stdscr, posy[0] + tamabay[0] * 0.5 + dist * 3 + 6, posx[0], "Salvar pedido");
             wattroff(stdscr, COLOR_PAIR(1));
          }
          cbreak();
@@ -508,7 +590,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
       }
       wrefresh(stdscr);
       curs_set(FALSE);
-      cmd = wgetch(stdscr);
+      if(!preenchidos[4]) cmd = wgetch(stdscr);
    }
 
    for(int i = 0; i < 5; i++)
@@ -517,6 +599,9 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
       delwin(subtelas[i]);
       delwin(telas[i]);
    }
+
+   cortina(stdscr, 0, setapos - 1, setapos + 1, 1);
+   cortina(stdscr, 0, posy[0] + tamabay[0] * 0.5 + dist * 3 - 2, maxstdy, 1);
 
    return novoPedido;
 
@@ -529,7 +614,8 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
       delwin(telas[i]);
    }
 
-   cortina(stdscr, 0, posy[0] + tamabay[0] * 0.5 + maxstdy * (8.0/teladevy) * 3 - 2, maxstdy, 1);
+   cortina(stdscr, 0, setapos - 1, setapos + 1, 1);
+   cortina(stdscr, 0, posy[0] + tamabay[0] * 0.5 + dist * 3 - 2, maxstdy, 1);
 
    for(short i = 0; i < novoPedido->itens._size; i++) 
    {  
@@ -540,4 +626,58 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
    free(novoPedido);
 
    return NULL;
+}
+
+void ListarPedidos(List *listaPedidos)
+{
+   unsigned short maxstdy, maxstdx;
+   getmaxyx(stdscr, maxstdy, maxstdx);
+
+   unsigned int n;
+   (listaPedidos->tam % 3 == 0 ? (n = listaPedidos->tam / 3) : (n = listaPedidos->tam / 3 + 1));
+
+   Node *paginas[n];
+
+   // if(!listaPedidos->head) goto listaVazia;
+
+   Node *atual = listaPedidos->head;
+   size_t ind = 0;
+   for(unsigned int cont = 1; atual; cont++, atual = atual->next)
+   {
+      if(cont % 3 == 1)
+      {
+         paginas[ind] = atual;
+         ind++;
+      }
+   }
+
+   unsigned short posy[] = {maxstdy * (15.0/teladevy),
+                            maxstdy * (22.0/teladevy),
+                            maxstdy * (29.0/teladevy)};
+
+   unsigned short posx[] = {maxstdx * (10.0/teladevx),
+                            posx[0],
+                            posx[0]};
+
+   WINDOW *telas[7];
+   WINDOW *subtelas[7];
+
+   for(short i = 0; i < 3; i++)
+   {
+      telas[i] = newwin(6, 35, posy[i], posx[i]);
+      wborder(telas[i], '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+      subtelas[i] = derwin(telas[i], 4, 33, 1, 1);
+      wnoutrefresh(telas[i]);
+   }
+
+   doupdate();
+
+   getch();
+
+   for(short i = 0; i < 3; i++)
+   {
+      cortina(telas[i], 0, 0, 6, 5);
+      delwin(subtelas[i]);
+      delwin(telas[i]);
+   }
 }

@@ -45,6 +45,68 @@ short lerStr(char *str, size_t buffer, WINDOW *tela)
    return validarStr(str);
 }
 
+short lerData(char* str, WINDOW* tela)
+{
+   unsigned short x = getcurx(tela), y = getcury(tela);
+    unsigned short ind = 0;
+    unsigned short dig = '0';
+    while(ind < 14 && dig != '\n')
+    {
+        dig = wgetch(tela);
+        if(dig >= '0' && dig <= '9')
+        {
+            *(str + ind) = (char)dig;
+            ind++;
+            x++;
+            if(ind == 2 || ind == 5)
+            {
+               *(str + ind) = '/';
+               ind++;
+               x++;
+               waddch(tela, '/');
+            }
+        }
+        else
+        {
+            if(dig == KEY_BACKSPACE)
+            {
+                if(ind > 0)
+                {
+                    if(ind == 3 || ind == 6)
+                    {
+                        x--;
+                        mvwaddch(tela, y, x, ' ');
+                        x--;
+                        mvwaddch(tela, y, x, ' ');
+                        wmove(tela, y, x);
+                        ind -= 2;
+                        continue;
+                    }
+                    x--;
+                    mvwaddch(tela, y, x, ' ');
+                    ind--;
+                    wmove(tela, y, x);
+                }
+            }
+            else
+            {
+               if(dig == 'z' || dig == 'Z') return 0;
+               else
+               {
+                  mvwaddch(tela, y, x, ' ');
+                  wmove(tela, y, x);
+               }
+            }
+        }
+    }
+    if(ind <= 9)
+    {
+      return 0;
+    }
+    *(str + ind) = '\0';
+    return 1;
+}
+
 short lerDouble(WINDOW *tela, double *valor)
 {
    unsigned short y, x;

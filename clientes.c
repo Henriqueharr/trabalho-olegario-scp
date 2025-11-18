@@ -218,12 +218,7 @@ void* criarCliente(Tipos dataType, List *lista)
                   short confirmou = lerCPF(cpf_cnpj, subtelas[opc - 1]);
                   Node *repetido = findCByCPF_CNPJ(lista, cpf_cnpj);
                   keypad(subtelas[opc - 1], FALSE);
-                  if(!confirmou)
-                  {
-                     werase(subtelas[opc - 1]);
-                     wrefresh(subtelas[opc - 1]);
-                     goto skip;
-                  }
+                  if(!confirmou) goto skip;
                   while(!validar_cpf(cpf_cnpj) || repetido)
                   {
                      cbreak();

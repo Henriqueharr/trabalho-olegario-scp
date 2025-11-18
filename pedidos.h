@@ -42,5 +42,6 @@ typedef struct Pedido
 } Pedido;
 
 Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos);
+void ListarPedidos(List *listaPedidos);
 
 #endif
