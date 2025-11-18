@@ -393,7 +393,9 @@ void ListarProdutos(List *listaProd)
    WINDOW *selecaoPagina = newwin(3, 19, yi - 3, xi[0]);
    WINDOW *subsel = derwin(selecaoPagina, 1, 8, 1, 1);
    wborder(selecaoPagina, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+   wattron(selecaoPagina, COLOR_PAIR(4));
    mvwaddstr(selecaoPagina, 0, 0, "Página");
+   wattroff(selecaoPagina, COLOR_PAIR(4));
    mvwprintw(selecaoPagina, 1, 1, "        /%d", n);
    wnoutrefresh(selecaoPagina);
    
@@ -555,7 +557,9 @@ void ListarProdutos(List *listaProd)
             WINDOW *selid = newwin(3, 25, ytamaba - 6, xi[0]);
             WINDOW *subselid = derwin(selid, 1, 23, 1, 1);
             wborder(selid, '|', '|', '~', '~', 'O', 'O', 'O', 'O');
+            wattron(selid, COLOR_PAIR(4));
             mvwaddstr(selid, 0, 0, "Consultar ID");
+            wattroff(selid, COLOR_PAIR(4));
             wrefresh(selid);
             echo();
             nocbreak();
@@ -637,6 +641,9 @@ void ListarProdutos(List *listaProd)
       delwin(subtelas[i]);
       delwin(telas[i]);
    }
+
+   delwin(subsel);
+   delwin(selecaoPagina);
 
    return;
    listaVazia:

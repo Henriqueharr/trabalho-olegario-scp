@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "clientes.h"
+#include "produtos.h"
 #include "safetyutils.h"
 #include "menus.h"
 #include "doublylinkedlist.h"
@@ -437,6 +438,34 @@ void carregarDados(List *lista, const char *nomeArquivo)
 
       return;
    }
+
+   if(strcmp(nomeArquivo, "produtos.csv") == 0)
+   {
+      char buffer[500];
+
+      while(fgets(buffer, sizeof(buffer), csv))
+      {
+         buffer[strcspn(buffer, "\n")] = '\0';
+
+         char *restante;
+
+         char **atributos = split(buffer);
+
+         Produto *conteudo = (Produto*)malloc(sizeof(Produto));
+         conteudo->id = strtoul(atributos[0], &restante, 10);
+         strncpy(conteudo->description, atributos[1], 150);
+         conteudo->price = atof(atributos[2]);
+         conteudo->stock = strtoul(atributos[3], &restante, 10);
+
+         createInsertNode(lista, conteudo, PRODUTO);
+
+         free(atributos);
+      }
+
+      fclose(csv);
+
+      return;
+   }
 }
 
 void SalvarDados(List *lista, const char *nomeArquivo)
@@ -458,6 +487,20 @@ void SalvarDados(List *lista, const char *nomeArquivo)
                         expand_node(atual, GenericCast)->data.address,
                         expand_node(atual, GenericCast)->data.phonenumber,
                         ((atual->dataType == PESSOA_FISICA) ? expand_node(atual, PessoaFisica)->cpf : expand_node(atual, PessoaJuridica)->cnpj));
+      }
+
+      goto salvou;
+   }
+
+   if(strcmp(nomeArquivo, "produtos.csv") == 0)
+   {
+      for(Node *atual = lista->head; atual; atual = atual->next)
+      {
+         fprintf(csv, "%zu;%s;%.2lf;%zu\n",
+                        expand_node(atual, Produto)->id,
+                        expand_node(atual, Produto)->description,
+                        expand_node(atual, Produto)->price,
+                        expand_node(atual, Produto)->stock);
       }
 
       goto salvou;

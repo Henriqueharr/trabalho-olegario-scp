@@ -34,10 +34,13 @@ int main()
 
    List LClientes, LPedidos, LProdutos;
    initList(&LClientes);
-   initList(&LPedidos);
    initList(&LProdutos);
+   initList(&LPedidos);
 
    
+   carregarDados(&LClientes, "clientes.csv");
+   carregarDados(&LProdutos, "produtos.csv");
+
    //Debug
    size_t last = 10123;
    // const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
@@ -71,18 +74,39 @@ int main()
       
    // }
 
-   for(size_t i = 123; i < last * 5; i++)
+   // for(size_t i = 123; i < last * 5; i++)
+   // {
+   //    Produto *novoProd = (Produto*)malloc(sizeof(Produto));
+   //    novoProd->id = i;
+   //    strncpy(novoProd->description, "Placeholder", 150);
+   //    novoProd->price = 25 + (i % 200) * (rand() % 5) + (rand() % 100)/100.0;
+   //    novoProd->stock = 75 + (rand() % 201); 
+   //    createInsertNode(&LProdutos, novoProd, PRODUTO);   
+   // }
+
+   for(size_t i = 123; i <= last; i++)
    {
-      Produto *novoProd = (Produto*)malloc(sizeof(Produto));
-      novoProd->id = i;
-      strncpy(novoProd->description, "Placeholder", 150);
-      novoProd->price = 25 + (i % 200) * (rand() % 5) + (rand() % 100)/100.0;
-      novoProd->stock = 75 + (rand() % 201); 
-      createInsertNode(&LProdutos, novoProd, PRODUTO);   
+      Pedido *novoPed = (Pedido*)malloc(sizeof(Pedido));
+      initVector(&novoPed->itens);
+      novoPed->id = i;
+      novoPed->customerId = (rand() % 50482) + 124;
+      strncpy(novoPed->date, "31/12/9999", 15);
+      double tot = 0;
+      for(size_t j = (rand() % 7) + 5; j > 0; j--)
+      {
+         ItemPedido *novoItem = (ItemPedido*)malloc(sizeof(ItemPedido));
+         novoItem->requestId = i;
+         size_t hmm = (rand() % 50482) + 124;
+         novoItem->productId = hmm;
+         novoItem->amount = (rand() % 100) + 20;
+         novoItem->subtotal = expand_node(findByID(&LProdutos, hmm), Produto)->price * novoItem->amount;
+         push_back(&novoPed->itens, novoItem);
+         tot += novoItem->subtotal;
+      }
+      novoPed->total = tot;
+      createInsertNode(&LPedidos, novoPed, PEDIDO);
    }
    //endDebug
-
-   carregarDados(&LClientes, "clientes.csv");
 
    MenuPrincipal opc = MENU_CLIENTES;
    
@@ -119,9 +143,9 @@ int main()
                            {
                               if(createInsertNode(&LClientes, novoCliente, dataType))
                               {
-                                 //gerar aviso de operação bem sucedida
+                                 gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Cliente salvo com sucesso");
                               }
-                              //else gerar aviso de erro
+                              else gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação fracassou", "Não foi possível adicionar o cliente aos dados");
                            }
                         }
                      }
@@ -184,7 +208,7 @@ int main()
                            {
                               gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Produto salvo com sucesso");
                            }
-                           //else gerar aviso de erro
+                           else gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação fracassou", "Não foi possível adicionar o produto aos dados");
                         }
                      }
                      direita(stdscr, maxstdx * (95.0/teladevx) - maxstdx * (50.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdx * (50.0/teladevx), 10);
@@ -232,18 +256,16 @@ int main()
                      void *novoPedido = &escolha;
                      cortina(stdscr, 0, maxstdy * (20.0/teladevy) + 7, maxstdy * (20.0/teladevy) + 15, 25);
                      abrir(stdscr, maxstdy * (20.0/teladevy) + 2, 4, 75);
-                     // esquerda(stdscr, maxstdx * (95.0/teladevx), maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdx * 0.45, 5);
-                     // descer(stdscr, maxstdx * (95.0/teladevx) - maxstdx * 0.45, maxstdy * (20.0/teladevy), maxstdy * (20.0/teladevy) + 5, 74, maxstdy * 0.475, 5);
                      while(novoPedido)
                      {
-                        novoPedido = criarPedido(&LPedidos, &LClientes, &LProdutos); //Função fodástica de criar produto
+                        novoPedido = criarPedido(&LPedidos, &LClientes, &LProdutos);
                         if(novoPedido) 
                         {
                            if(createInsertNode(&LPedidos, novoPedido, PEDIDO))
                            {
-                              gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Produto salvo com sucesso");
+                              gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação bem sucedida", "Pedido salvo com sucesso");
                            }
-                           //else gerar aviso de erro
+                           else gerarAviso(maxstdy * (15.0/teladevy), maxstdx * (30.0/teladevx), maxstdy * 0.5 - (maxstdy * (15.0/teladevy)) * 0.5, maxstdx * 0.5 - (maxstdx * (30.0/teladevx)) * 0.5, "||~~OOOO", "Operação fracassou", "Não foi possível adicionar o pedido aos dados");
                         }
                      }
                   }
@@ -252,7 +274,7 @@ int main()
                   {
                      abrir(stdscr, maxstdy * (20.0/teladevy) + 8, 29, 25);
                      ListarPedidos(&LPedidos);
-                     cortina(stdscr, 0, 0, maxstdy, 10);
+                     cortina(stdscr, 0, 0, maxstdy, 5);
                   }
                   break;
                   case EDITAR_PEDIDO:
@@ -283,6 +305,7 @@ int main()
    }
 
    SalvarDados(&LClientes, "clientes.csv");
+   SalvarDados(&LProdutos, "produtos.csv");
 
    endwin();
 

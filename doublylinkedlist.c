@@ -48,7 +48,7 @@ void removeNode(List *lista, Node *target)
    
    if(target->dataType == PEDIDO)
    {
-
+      
    }
 
    if(!target->prev)
