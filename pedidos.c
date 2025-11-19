@@ -983,3 +983,31 @@ void ListarPedidos(List *listaPedidos)
    gerarAviso(tamerroy, tamerrox, maxstdy * 0.5 - (tamerroy) * 0.5, maxstdx * 0.5 - (tamerrox) * 0.5, "||~~OOOO", "Erro de carregamento", "A lista de pedidos encontra-se vazia no momento");
    curs_set(TRUE);
 }
+
+int produtoEstaEmUmPedido(List *LPedidos, size_t produtoID)
+{
+    if (!LPedidos || !LPedidos->head) return 0;
+
+    Node *nPedido = LPedidos->head;
+    while (nPedido)
+    {
+        Pedido *p = expand_node(nPedido, Pedido); // assumindo macro expand_node
+
+        // Se seus pedidos guardam itens em um vetor parecido com novoPedido->itens
+        for (size_t i = 0; i < p->itens._size; ++i)
+        {
+            ItemPedido *it = &access_index(p->itens, ItemPedido, i);
+            // ajuste o campo se seu ItemPedido chama-se productId / produtoID etc.
+            if (it->productId == produtoID)
+                return 1;
+        }
+
+        // se itens forem em List (doublylinkedlist), itere parecido com:
+        // Node *nItem = p->itens.head;
+        // while(nItem) { ItemPedido *it = expand_node(nItem, ItemPedido); if(it->productId == produtoID) return 1; nItem = nItem->next; }
+
+        nPedido = nPedido->next;
+    }
+
+    return 0;
+}

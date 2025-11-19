@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <math.h>
+#include <string.h>
 #include "safetyutils.h"
 #include "doublylinkedlist.h"
 #include "produtos.h"
 #include "menus.h"
+
 
 extern double teladevy, teladevx;
 
@@ -651,3 +653,280 @@ void ListarProdutos(List *listaProd)
    gerarAviso(ytamerro, xtamerro, maxstdy * 0.5 - (ytamerro) * 0.5, maxstdx * 0.5 - (xtamerro) * 0.5, "||~~OOOO", "Erro de carregamento", "A lista de produtos encontra-se vazia no momento");
    curs_set(TRUE);
 }
+
+int removerProduto(List *L, size_t id)
+{
+    if(!L || !L->head) return 0;
+
+    Node *atual = L->head;
+
+    while(atual)
+    {
+        Produto *p = expand_node(atual, Produto);
+
+        if(p->id == id)
+        {
+            // Ajustar encadeamento
+            if(atual->prev)
+                atual->prev->next = atual->next;
+            else
+                L->head = atual->next;
+
+            if(atual->next)
+                atual->next->prev = atual->prev;
+            else
+                L->tail = atual->prev;
+
+            free(p);
+            free(atual);
+            L->tam--;
+
+            return 1;
+        }
+
+        atual = atual->next;
+    }
+
+    return 0;
+}
+
+
+Produto* buscarProdutoPorID(List *L, size_t id)
+{
+    if(!L || !L->head) return NULL;
+
+    Node *n = L->head;
+
+    while(n)
+    {
+        Produto *p = expand_node(n, Produto);
+        if(p->id == id)
+            return p;
+
+        n = n->next;
+    }
+
+    return NULL;
+}
+
+
+Produto* selecionarProduto(List *L)
+{
+    if (!L || !L->head) return NULL;
+
+    int altura = 9;
+    int largura = 60;
+    int starty = (LINES - altura) / 2;
+    int startx = (COLS - largura) / 2;
+
+    WINDOW *win = newwin(altura, largura, starty, startx);
+    keypad(win, TRUE);
+    curs_set(TRUE);
+    echo();
+
+    char buffer[32];
+    size_t id_procurado;
+    Produto *resultado = NULL;
+    int cancelou = 0; // flag para saber se o usuário cancelou
+
+    while (!resultado && !cancelou)
+    {
+        // Janela para digitar ID
+        werase(win);
+        box(win, 0, 0);
+        mvwaddstr(win, 1, 2, "Digite o ID do produto (Z para cancelar):");
+        mvwaddstr(win, 3, 2, "> ");
+        wrefresh(win);
+
+           // Entrada de ID caractere por caractere, Z cancela imediatamente
+   memset(buffer, 0, sizeof(buffer));
+   int pos = 0;
+   int ch;
+   int cancelou = 0; // flag de cancelamento
+
+   wmove(win, 3, 4);
+   cbreak();
+   noecho();
+   keypad(win, TRUE);
+   flushinp();
+
+   while (1)
+   {
+       ch = wgetch(win);
+
+       // Z cancela imediatamente
+       if (ch == 'z' || ch == 'Z')
+       {
+           cancelou = 1;
+           break;
+       }
+
+       // ENTER confirma
+       if (ch == '\n')
+       {
+           buffer[pos] = '\0';
+           break;
+       }
+
+       // Backspace
+       if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0)
+       {
+           pos--;
+           buffer[pos] = '\0';
+           mvwaddch(win, 3, 4 + pos, ' ');
+           wmove(win, 3, 4 + pos);
+           wrefresh(win);
+           continue;
+       }
+
+       // Apenas números
+       if (ch >= '0' && ch <= '9' && pos < (int)sizeof(buffer) - 1)
+       {
+           buffer[pos++] = ch;
+           mvwaddch(win, 3, 4 + pos - 1, ch);
+           wrefresh(win);
+       }
+   }
+
+   if (cancelou)
+       return NULL;
+
+
+
+
+           // Cancelamento na entrada
+           if (buffer[0] == 'z' || buffer[0] == 'Z')
+           {
+               cancelou = 1;
+               break;
+           }
+
+           id_procurado = strtoul(buffer, NULL, 10);
+
+           // Procura o produto
+           Node *tmp = L->head;
+           while (tmp)
+           {
+               Produto *p = expand_node(tmp, Produto);
+               if (p->id == id_procurado)
+               {
+                   resultado = p;
+                   break;
+               }
+               tmp = tmp->next;
+           }
+
+           if (!resultado)
+           {
+               // Produto não encontrado
+               werase(win);
+               box(win, 0, 0);
+               mvwaddstr(win, 3, 2, "Produto não encontrado. \nPressione qualquer tecla para tentar novamente.");
+               wrefresh(win);
+               wgetch(win);
+           }
+       }
+
+       // Se cancelou na entrada, sai sem afetar menus externos
+       if (cancelou)
+       {
+           delwin(win);
+           noecho();
+           curs_set(FALSE);
+           return NULL;
+       }
+
+       // Produto encontrado: mostra detalhes antes da confirmação
+       int cancelar_confirmacao = 0;
+       while (!cancelar_confirmacao)
+       {
+           werase(win);
+           box(win, 0, 0);
+           mvwprintw(win, 1, 2, "Produto encontrado (Z para cancelar):");
+           mvwprintw(win, 3, 2, "ID:%zu  %s   R$%.2lf   Est:%zu",
+                     resultado->id, resultado->description,
+                     resultado->price, resultado->stock);
+           mvwaddstr(win, 5, 2, "Pressione ENTER para continuar...");
+           wrefresh(win);
+
+           int ch = wgetch(win);
+           if (ch == '\n') break; // prossegue para confirmação final
+           if (ch == 'z' || ch == 'Z')
+           {
+               cancelar_confirmacao = 1;
+               resultado = NULL; // cancela a operação
+               break;
+           }
+       }
+
+       // Se cancelou aqui, sai da função
+       if (!resultado)
+       {
+           delwin(win);
+           noecho();
+           curs_set(FALSE);
+           return NULL;
+       }
+
+       // Confirmação final com setas funcionando
+   // ATIVE OS MODOS ANTES DO LOOP
+   cbreak();
+   noecho();
+   keypad(win, TRUE);
+   flushinp();
+
+   int index = 0; // 0 = Sim, 1 = Não
+   int confirmou = 0;
+
+   while (!confirmou)
+   {
+       werase(win);
+       box(win, 0, 0);
+
+       mvwaddstr(win, 1, 2, "Tem certeza que deseja selecionar este produto?");
+       mvwprintw(win, 3, 2, "ID:%zu  %s   R$%.2lf   Est:%zu",
+                 resultado->id, resultado->description,
+                 resultado->price, resultado->stock);
+
+       // Desenha a opção selecionada
+       mvwaddstr(win, 5, 2, 
+           index == 0 ? "> Sim   Não" : "  Sim  > Não");
+
+       mvwaddstr(win, 7, 2, "Use ← → para mover, ENTER confirma, Z cancela");
+
+       wrefresh(win);
+
+       flushinp();             //  LIMPA O BUFFER, IMPORTANTE!!!
+       int ch = wgetch(win);   // lê a tecla corretamente
+
+       switch (ch)
+       {
+           case KEY_LEFT:
+               index = 0;
+               break;
+
+           case KEY_RIGHT:
+               index = 1;
+               break;
+
+           case 'z':
+           case 'Z':
+               resultado = NULL;
+               confirmou = 1;
+               break;
+
+           case '\n':
+               confirmou = 1;
+               if (index == 1)
+                   resultado = NULL;  // "Não"
+               break;
+       }
+   }
+
+
+
+       delwin(win);
+       noecho();
+       curs_set(FALSE);
+       return resultado; // pode ser NULL se cancelado
+   }

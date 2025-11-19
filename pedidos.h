@@ -1,5 +1,8 @@
 #ifndef PEDIDOS_UTILS_H
 #define PEDIDOS_UTILS_H
+#ifndef PEDIDOS_H
+#define PEDIDOS_H
+
 
 #include "vector.h"
 #include "doublylinkedlist.h"
@@ -44,4 +47,6 @@ typedef struct Pedido
 Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos);
 void ListarPedidos(List *listaPedidos);
 
+int produtoEstaEmUmPedido(List *LPedidos, size_t produtoID);
+#endif
 #endif

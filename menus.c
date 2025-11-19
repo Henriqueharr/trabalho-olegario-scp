@@ -506,3 +506,20 @@ void showMenuRequest(MenuPedido *opc)
    echo();
    nocbreak();
 }
+
+int lerTecla() {
+    int ch = getch();
+
+    if (ch == 27) {            // ESC
+        int ch2 = getch();
+        if (ch2 == 91) {       // '['
+            int ch3 = getch();
+            if (ch3 == 'A') return KEY_UP;
+            if (ch3 == 'B') return KEY_DOWN;
+            if (ch3 == 'C') return KEY_RIGHT;
+            if (ch3 == 'D') return KEY_LEFT;
+        }
+    }
+
+    return ch; // tecla normal
+}

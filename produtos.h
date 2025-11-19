@@ -24,4 +24,8 @@ Produto* criarProduto(List *listaProdutos);
 
 void ListarProdutos(List *listaProd);
 
+Produto* selecionarProduto(List *L);
+int removerProduto(List *L, size_t id);
+Produto* buscarProdutoPorID(List *L, size_t id);
+
 #endif
