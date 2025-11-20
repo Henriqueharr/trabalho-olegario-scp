@@ -1262,3 +1262,235 @@ Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj)
 
    return NULL;
 }
+
+void *buscarClientePorID(List *L, size_t id)
+{
+    Node *n = findByID(L, id);
+    if (!n) return NULL;
+
+    return n->content;
+}
+
+bool removerCliente(List *L, size_t id)
+{
+    if (!L || L->tam == 0) return false;
+
+    Node *n = findByID(L, id);
+    if (!n) return false;
+
+    removeNode(L, n);  // removeNode já libera target->content e o Node
+
+    return true;
+}
+
+
+
+
+bool removerClienteComInterface(List *L)
+{
+    if (!L || L->tam == 0) return false;
+
+    unsigned short maxy, maxx;
+    getmaxyx(stdscr, maxy, maxx);
+
+    size_t id;
+    echo();
+    curs_set(TRUE);
+
+    char buffer[32];
+    int pos;
+    int ch;
+    bool cancelou = false;
+    Node *n = NULL;
+
+    while (!cancelou && !n)
+    {
+        // ----------------------
+        // Janela para digitar ID
+        // ----------------------
+        int input_height = 5;
+        int input_width  = 50;
+        int input_starty = maxy / 2 - 3;
+        int input_startx = maxx / 2 - input_width / 2;
+
+        clear();
+        refresh();
+
+        WINDOW *inputWin = newwin(input_height, input_width, input_starty, input_startx);
+        keypad(inputWin, TRUE);
+
+        box(inputWin, 0, 0);
+        mvwaddstr(inputWin, 1, 2, "Digite o ID do cliente (Z para cancelar):");
+        mvwaddstr(inputWin, 3, 2, "> ");
+        wrefresh(inputWin);
+
+        memset(buffer, 0, sizeof(buffer));
+        pos = 0;
+
+        cbreak();
+        noecho();
+        flushinp();
+        wmove(inputWin, 3, 4);
+
+        // Entrada de ID caractere a caractere
+        while (1)
+        {
+            ch = wgetch(inputWin);
+
+            if (ch == 'Z' || ch == 'z')
+            {
+                cancelou = true;
+                break;
+            }
+
+            if (ch == '\n')
+            {
+                buffer[pos] = '\0';
+                break;
+            }
+
+            if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0)
+            {
+                pos--;
+                buffer[pos] = '\0';
+                mvwaddch(inputWin, 3, 4 + pos, ' ');
+                wmove(inputWin, 3, 4 + pos);
+                wrefresh(inputWin);
+                continue;
+            }
+
+            if (ch >= '0' && ch <= '9' && pos < (int)sizeof(buffer) - 1)
+            {
+                buffer[pos++] = ch;
+                mvwaddch(inputWin, 3, 4 + pos - 1, ch);
+                wrefresh(inputWin);
+            }
+        }
+
+        if (cancelou)
+        {
+            delwin(inputWin);
+            clear();
+            refresh();
+            return false;
+        }
+
+        id = strtoul(buffer, NULL, 10);
+
+        n = findByID(L, id);
+        if (!n)
+        {
+            
+            // Janela de erro à direita da janela de ID
+            
+            int err_height = 5;
+            int err_width  = 60;
+            int err_starty = input_starty;
+            int err_startx = input_startx + input_width + 2; 
+
+            WINDOW *errWin = newwin(err_height, err_width, err_starty, err_startx);
+            box(errWin, 0, 0);
+            mvwprintw(errWin, 2, 2, "Cliente nao encontrado!");
+            mvwprintw(errWin, 3, 2, "Pressione qualquer tecla para tentar novamente...");
+            wrefresh(errWin);
+
+            wgetch(errWin);
+            delwin(errWin);
+            n = NULL; 
+        }
+
+        delwin(inputWin);
+    }
+
+    if (cancelou || !n)
+    {
+        clear();
+        refresh();
+        return false;
+    }
+
+    // Determina tipo do cliente
+    Cliente *c;
+    PessoaFisica *pf = NULL;
+    PessoaJuridica *pj = NULL;
+
+    if (n->dataType == PESSOA_FISICA)
+    {
+        pf = expand_node(n, PessoaFisica);
+        c = &pf->data;
+    }
+    else if (n->dataType == PESSOA_JURIDICA)
+    {
+        pj = expand_node(n, PessoaJuridica);
+        c = &pj->data;
+    }
+    else return false;
+
+    
+    // Janela de confirmação
+    
+    int conf_height = 10;
+    int conf_width  = 60;
+    int conf_starty = maxy / 2 - conf_height / 2;
+    int conf_startx = maxx / 2 - conf_width / 2;
+
+    WINDOW *confWin = newwin(conf_height, conf_width, conf_starty, conf_startx);
+    keypad(confWin, TRUE);
+
+    clear();
+    refresh();
+
+    int selected = 1; // começa em "Não"
+    bool confirm = false;
+
+    while (1)
+    {
+        werase(confWin);
+        box(confWin, 0, 0);
+        mvwprintw(confWin, 1, 2, "Deseja realmente excluir o cliente (Z para cancelar)?");
+        mvwprintw(confWin, 3, 2, "ID: %zu", c->id);
+        mvwprintw(confWin, 4, 2, "Nome: %s", c->name);
+        mvwprintw(confWin, 5, 2, "Endereço: %s", c->address);
+        mvwprintw(confWin, 6, 2, "Telefone: %s", c->phonenumber);
+        if (pf) mvwprintw(confWin, 7, 2, "CPF: %s", pf->cpf);
+        if (pj) mvwprintw(confWin, 7, 2, "CNPJ: %s", pj->cnpj);
+
+        if (selected == 0)
+            mvwprintw(confWin, 8, 2, "> Sim   Não");
+        else
+            mvwprintw(confWin, 8, 2, "  Sim  > Não");
+
+        wrefresh(confWin);
+
+        ch = wgetch(confWin);
+
+        if (ch == KEY_LEFT || ch == KEY_UP) selected = 0;
+        else if (ch == KEY_RIGHT || ch == KEY_DOWN) selected = 1;
+        else if (ch == 'Z' || ch == 'z')
+        {
+            confirm = false;
+            break;
+        }
+        else if (ch == '\n')
+        {
+            confirm = (selected == 0);
+            break;
+        }
+    }
+
+    delwin(confWin);
+    clear();
+    refresh();
+
+    if (confirm)
+    {
+        removerCliente(L, id);
+        gerarAviso(maxy/3, 60, maxy/2 - 3, maxx/2 - 30, "||~~OOOO", "Sucesso", "Cliente removido com sucesso!");
+        return true;
+    }
+    else
+    {
+        gerarAviso(maxy/3, 60, maxy/2 - 3, maxx/2 - 30, "||~~OOOO", "Cancelado", "Operacao cancelada pelo usuario.");
+        return false;
+    }
+}

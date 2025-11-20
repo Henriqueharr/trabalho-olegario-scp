@@ -1,6 +1,8 @@
 #ifndef CLIENTES_UTILS_H
 #define CLIENTES_UTILS_H
 
+
+
 #include "doublylinkedlist.h"
 
 #define get_ctype(void_ptr,type) ((type*)void_ptr)
@@ -71,5 +73,15 @@ void editarCliente(List *listaClientes);
 
 //Função para achar um nó pelo CPF ou CNPJ
 Node* findCByCPF_CNPJ(List *lista, const char *cpf_cnpj);
+
+
+
+
+
+void *buscarClientePorID(List *L, size_t id);
+
+bool removerCliente(List *L, size_t id);
+
+bool removerClienteComInterface(List *L);;
 
 #endif
