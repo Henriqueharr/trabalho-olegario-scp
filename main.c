@@ -40,9 +40,10 @@ int main()
    
    carregarDados(&LClientes, "clientes.csv");
    carregarDados(&LProdutos, "produtos.csv");
+   carregarDados(&LPedidos, "pedidos.csv");
 
    //Debug
-   size_t last = 10123;
+   // size_t last = 10123;
    // const char *seila[] = {"Pedro Migliori", "Mateus Betelle", "Thiago Bahia", "Lucas Oliver", "Davi Jaime", "Gustavo Barros", "Eduardo Valcacer", "Henrique Augusto"};
    // for(size_t i = 123; i < last * 5; i++)
    // {
@@ -84,28 +85,28 @@ int main()
    //    createInsertNode(&LProdutos, novoProd, PRODUTO);   
    // }
 
-   for(size_t i = 123; i <= last; i++)
-   {
-      Pedido *novoPed = (Pedido*)malloc(sizeof(Pedido));
-      initVector(&novoPed->itens);
-      novoPed->id = i;
-      novoPed->customerId = (rand() % 50482) + 124;
-      strncpy(novoPed->date, "31/12/9999", 15);
-      double tot = 0;
-      for(size_t j = (rand() % 7) + 5; j > 0; j--)
-      {
-         ItemPedido *novoItem = (ItemPedido*)malloc(sizeof(ItemPedido));
-         novoItem->requestId = i;
-         size_t hmm = (rand() % 50482) + 124;
-         novoItem->productId = hmm;
-         novoItem->amount = (rand() % 100) + 20;
-         novoItem->subtotal = expand_node(findByID(&LProdutos, hmm), Produto)->price * novoItem->amount;
-         push_back(&novoPed->itens, novoItem);
-         tot += novoItem->subtotal;
-      }
-      novoPed->total = tot;
-      createInsertNode(&LPedidos, novoPed, PEDIDO);
-   }
+   // for(size_t i = 123; i <= last; i++)
+   // {
+   //    Pedido *novoPed = (Pedido*)malloc(sizeof(Pedido));
+   //    initVector(&novoPed->itens);
+   //    novoPed->id = i;
+   //    novoPed->customerId = (rand() % 50482) + 124;
+   //    strncpy(novoPed->date, "31/12/9999", 15);
+   //    double tot = 0;
+   //    for(size_t j = (rand() % 7) + 5; j > 0; j--)
+   //    {
+   //       ItemPedido *novoItem = (ItemPedido*)malloc(sizeof(ItemPedido));
+   //       novoItem->requestId = i;
+   //       size_t hmm = (rand() % 50482) + 124;
+   //       novoItem->productId = hmm;
+   //       novoItem->amount = (rand() % 100) + 20;
+   //       novoItem->subtotal = expand_node(findByID(&LProdutos, hmm), Produto)->price * novoItem->amount;
+   //       push_back(&novoPed->itens, novoItem);
+   //       tot += novoItem->subtotal;
+   //    }
+   //    novoPed->total = tot;
+   //    createInsertNode(&LPedidos, novoPed, PEDIDO);
+   // }
    //endDebug
 
    MenuPrincipal opc = MENU_CLIENTES;
@@ -354,6 +355,7 @@ int main()
 
    SalvarDados(&LClientes, "clientes.csv");
    SalvarDados(&LProdutos, "produtos.csv");
+   SalvarDados(&LPedidos, "pedidos.csv");
 
    endwin();
 

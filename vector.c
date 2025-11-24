@@ -26,7 +26,7 @@ void push_back(Vector *vetor, void* elemento)
 
 void erasePos(Vector *vetor, size_t pos)
 {
-   if(pos >= vetor->_size) return;
+   if(pos >= vetor->_size || pos < 0) return;
    size_t i;
    for(i = pos; i < vetor->_size - 1; i++) vetor->container[i] = vetor->container[i + 1];
    vetor->container[--vetor->_current_pb] = NULL;

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "clientes.h"
 #include "produtos.h"
+#include "pedidos.h"
 #include "safetyutils.h"
 #include "menus.h"
 #include "doublylinkedlist.h"
@@ -466,6 +467,52 @@ void carregarDados(List *lista, const char *nomeArquivo)
 
       return;
    }
+
+   if(strcmp(nomeArquivo, "pedidos.csv") == 0)
+   {
+      
+      char buffer[500];
+
+      while(fgets(buffer, sizeof(buffer), csv))
+      {
+         buffer[strcspn(buffer, "\n")] = '\0';
+
+         char *restante;
+
+         char **atributos = split(buffer);
+
+         Pedido* novoPedido = (Pedido*)malloc(sizeof(Pedido));
+         initVector(&novoPedido->itens);
+         
+         novoPedido->id = strtoul(atributos[0], &restante, 10);
+         novoPedido->customerId = strtoul(atributos[1], &restante, 10);
+         strcpy(novoPedido->date, atributos[2]);
+         novoPedido->total = atof(atributos[3]);
+         unsigned short itens = atoi(atributos[4]);
+
+         free(atributos);
+
+         for(unsigned short i = 0; i < itens; i++)
+         {
+            fgets(buffer, sizeof(buffer), csv);
+            atributos = split(buffer);
+
+            ItemPedido* novoItem = (ItemPedido*)malloc(sizeof(ItemPedido));
+            novoItem->requestId = novoPedido->id;
+            novoItem->productId = strtoul(atributos[0], &restante, 10);
+            novoItem->amount = strtoul(atributos[1], &restante, 10);
+            novoItem->subtotal = atof(atributos[2]);
+
+            push_back(&novoPedido->itens, novoItem);
+
+            free(atributos);
+         }
+
+         createInsertNode(lista, novoPedido, PEDIDO);
+      }
+      
+      fclose(csv);
+   }
 }
 
 void SalvarDados(List *lista, const char *nomeArquivo)
@@ -506,7 +553,26 @@ void SalvarDados(List *lista, const char *nomeArquivo)
       goto salvou;
    }
 
+   if(strcmp(nomeArquivo, "pedidos.csv") == 0)
+   {
+      for(Node* atual = lista->head; atual; atual = atual->next)
+      {
+         fprintf(csv, "%zu;%zu;%s;%.2lf;%zu\n",
+                        expand_node(atual, Pedido)->id,
+                        expand_node(atual, Pedido)->customerId,
+                        expand_node(atual, Pedido)->date,
+                        expand_node(atual, Pedido)->total,
+                        expand_node(atual, Pedido)->itens._size);
 
+         for(short i = 0; i < expand_node(atual, Pedido)->itens._size; i++)
+         {
+            fprintf(csv, "%zu;%zu;%.2lf\n",
+                           access_index(expand_node(atual, Pedido)->itens, ItemPedido, i).productId,
+                           access_index(expand_node(atual, Pedido)->itens, ItemPedido, i).amount,
+                           access_index(expand_node(atual, Pedido)->itens, ItemPedido, i).subtotal);
+         }
+      }
+   }
 
    salvou:
    char retorno[BUFSIZ];

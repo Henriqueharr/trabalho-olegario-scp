@@ -48,14 +48,20 @@ void removeNode(List *lista, Node *target)
    
    if(target->dataType == PEDIDO)
    {
-      
+      Vector* itens = &expand_node(target, Pedido)->itens;
+
+      for(short i = 0; i < itens->_size; i++)
+      {
+         free(itens->container[i]);
+      }
+      free(itens->container);
    }
 
    if(!target->prev)
    {
       lista->head = lista->head->next;
       if(lista->head) lista->head->prev = NULL;
-      if(!(--lista->tam) == 0) lista->tail = NULL;
+      if(!(--lista->tam)) lista->tail = NULL;
       free(target->content);
       free(target);
       return;
