@@ -1011,3 +1011,195 @@ int produtoEstaEmUmPedido(List *LPedidos, size_t produtoID)
 
     return 0;
 }
+
+
+
+bool removerPedidoComInterface(List *L)
+{
+      if (!L || L->tam == 0) return false;
+   
+      unsigned short maxy, maxx;
+      getmaxyx(stdscr, maxy, maxx);
+   
+      size_t id;
+      char buffer[32];
+      int pos, ch;
+      bool cancelou = false;
+      Node *n = NULL;
+   
+      echo();
+      curs_set(TRUE);
+   
+      while (!cancelou && !n)
+      {
+          int input_height = 5;
+          int input_width  = 50;
+          int input_starty = maxy / 2 - 3;
+          int input_startx = maxx / 2 - input_width / 2;
+      
+          clear();
+          refresh();
+      
+          WINDOW *inputWin = newwin(input_height, input_width, input_starty, input_startx);
+          keypad(inputWin, TRUE);
+      
+          box(inputWin, 0, 0);
+          mvwaddstr(inputWin, 1, 2, "Digite o ID do pedido (Z para cancelar):");
+          mvwaddstr(inputWin, 3, 2, "> ");
+          wrefresh(inputWin);
+      
+          memset(buffer, 0, sizeof(buffer));
+          pos = 0;
+      
+          cbreak();
+          noecho();
+          flushinp();
+          wmove(inputWin, 3, 4);
+      
+          while (1)
+          {
+              ch = wgetch(inputWin);
+         
+              if (ch == 'Z' || ch == 'z')
+              {
+                  cancelou = true;
+                  break;
+              }
+              if (ch == '\n')
+              {
+                  buffer[pos] = '\0';
+                  break;
+              }
+              if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0)
+              {
+                  pos--;
+                  buffer[pos] = '\0';
+                  mvwaddch(inputWin, 3, 4 + pos, ' ');
+                  wmove(inputWin, 3, 4 + pos);
+                  wrefresh(inputWin);
+                  continue;
+              }
+              if (ch >= '0' && ch <= '9' && pos < (int)sizeof(buffer) - 1)
+              {
+                  buffer[pos++] = ch;
+                  mvwaddch(inputWin, 3, 4 + pos - 1, ch);
+                  wrefresh(inputWin);
+              }
+          }
+        
+          if (cancelou)
+          {
+              delwin(inputWin);
+              clear();
+              refresh();
+              return false;
+          }
+        
+          id = strtoul(buffer, NULL, 10);
+          n = findByID(L, id);
+        
+          if (!n)
+          {
+              int err_height = 5;
+              int err_width  = 60;
+              int err_starty = input_starty;
+              int err_startx = input_startx + input_width + 2;
+         
+              WINDOW *errWin = newwin(err_height, err_width, err_starty, err_startx);
+              box(errWin, 0, 0);
+              mvwprintw(errWin, 2, 2, "Pedido nao encontrado!");
+              mvwprintw(errWin, 3, 2, "Pressione qualquer tecla para tentar novamente...");
+              wrefresh(errWin);
+         
+              wgetch(errWin);
+              delwin(errWin);
+         
+              n = NULL;
+          }
+        
+          delwin(inputWin);
+      }
+    
+      if (cancelou || !n)
+      {
+          clear();
+          refresh();
+          return false;
+      }
+    
+      //dados do pedido
+      Pedido *p = expand_node(n, Pedido);
+    
+      int conf_height = 12;
+      int conf_width  = 60;
+      int conf_starty = maxy / 2 - conf_height / 2;
+      int conf_startx = maxx / 2 - conf_width / 2;
+    
+      WINDOW *confWin = newwin(conf_height, conf_width, conf_starty, conf_startx);
+      keypad(confWin, TRUE);
+    
+      clear();
+      refresh();
+    
+      int selecionado = 1;
+      bool confirm = false;
+    
+      while (1)
+      {
+          werase(confWin);
+          box(confWin, 0, 0);
+      
+          mvwprintw(confWin, 1, 2, "Deseja realmente excluir o pedido? (Z para cancelar)");
+      
+          mvwprintw(confWin, 3, 2, "ID: %zu",       p->id);
+          mvwprintw(confWin, 4, 2, "Cliente ID: %zu", p->customerId);
+          mvwprintw(confWin, 5, 2, "Data: %s",     p->date);
+          mvwprintw(confWin, 6, 2, "Total: %.2f",  p->total);
+          mvwprintw(confWin, 7, 2, "Itens: %d",    p->itens._size);
+      
+          if (selecionado == 0)
+              mvwprintw(confWin, 10, 2, "> Sim   Não");
+          else
+              mvwprintw(confWin, 10, 2, "  Sim  > Não");
+      
+          wrefresh(confWin);
+      
+          ch = wgetch(confWin);
+          if (ch == KEY_LEFT || ch == KEY_UP) selecionado = 0;
+          else if (ch == KEY_RIGHT || ch == KEY_DOWN) selecionado = 1;
+          else if (ch == 'Z' || ch == 'z')
+          {
+              confirm = false;
+              break;
+          }
+          else if (ch == '\n')
+          {
+              confirm = (selecionado == 0);
+              break;
+          }
+      }
+    
+      
+    
+      delwin(confWin);
+      clear();
+      refresh();
+    
+      if (!confirm)
+      {
+          gerarAviso(maxy/3, 60, maxy/2 - 3, maxx/2 - 30,
+                     "||~~OOOO", "Cancelado", "Operacao cancelada pelo usuario.");
+          return false;
+      }
+    
+    
+    
+      //para remover o pedido
+      removeNode(L, n);
+    
+      gerarAviso(maxy/3, 60, maxy/2 - 3, maxx/2 - 30,
+                 "||~~OOOO", "Sucesso", "Pedido removido com sucesso!");
+      
+      return true;
+}  
+   

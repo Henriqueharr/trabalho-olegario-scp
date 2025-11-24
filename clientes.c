@@ -1278,7 +1278,7 @@ bool removerCliente(List *L, size_t id)
     Node *n = findByID(L, id);
     if (!n) return false;
 
-    removeNode(L, n);  // removeNode já libera target->content e o Node
+    removeNode(L, n); 
 
     return true;
 }

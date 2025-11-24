@@ -48,5 +48,7 @@ Pedido* criarPedido(List* listaPedidos, List* listaClientes, List* listaProdutos
 void ListarPedidos(List *listaPedidos);
 
 int produtoEstaEmUmPedido(List *LPedidos, size_t produtoID);
+
+bool removerPedidoComInterface(List *lista);
 #endif
 #endif

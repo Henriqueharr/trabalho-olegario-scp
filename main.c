@@ -72,10 +72,9 @@ int main()
    //       strncpy(conteudo->cnpj, "00.000.000/0001-00\0", 20);
    //       createInsertNode(&LClientes, conteudo, PESSOA_JURIDICA);
    //    }
-      
+   // 
    // }
-
-   // for(size_t i = 123; i < last * 5; i++)
+   //for(size_t i = 123; i < last * 5; i++)
    // {
    //    Produto *novoProd = (Produto*)malloc(sizeof(Produto));
    //    novoProd->id = i;
@@ -84,8 +83,7 @@ int main()
    //    novoProd->stock = 75 + (rand() % 201); 
    //    createInsertNode(&LProdutos, novoProd, PRODUTO);   
    // }
-
-   // for(size_t i = 123; i <= last; i++)
+   //for(size_t i = 123; i <= last; i++)
    // {
    //    Pedido *novoPed = (Pedido*)malloc(sizeof(Pedido));
    //    initVector(&novoPed->itens);
@@ -108,8 +106,7 @@ int main()
    //    createInsertNode(&LPedidos, novoPed, PEDIDO);
    // }
    //endDebug
-
-   MenuPrincipal opc = MENU_CLIENTES;
+  MenuPrincipal opc = MENU_CLIENTES;
    
    while(opc != ENCERRAR_PROGRAMA)
    {
@@ -231,52 +228,54 @@ int main()
                   case REMOVER_PRODUTO:
                   {
                   abrir(stdscr, maxstdy * (20.0 / teladevy) + 8, 29, 25);
-                                    
-                                 keypad(stdscr, TRUE);
-                                 Produto *sel = selecionarProduto(&LProdutos);
-                                    
-                                   clear();
-                                   refresh();
-                                    
-                                 if (sel)
-                                 {
-                                     // 1) Verifica se produto está em algum pedido
-                                     if (produtoEstaEmUmPedido(&LPedidos, sel->id))
-                                     {
-                                         gerarAviso(
-                                             maxstdy * (20.0 / teladevy),
-                                             maxstdx * (45.0 / teladevx),
-                                             maxstdy * 0.5 - (maxstdy * (15.0 / teladevy)) * 0.5,
-                                             maxstdx * 0.5 - (maxstdx * (30.0 / teladevx)) * 0.5,
-                                             "||~~OOOO",
-                                             "Produto não pode ser removido",
-                                             "Este produto está vinculado a um pedido!");
-                                     }
-                                     // 2) Pode remover normalmente
-                                     else if (removerProduto(&LProdutos, sel->id))
-                                     {
-                                         gerarAviso(
-                                             maxstdy * (15.0 / teladevy),
-                                             maxstdx * (30.0 / teladevx),
-                                             maxstdy * 0.5 - (maxstdy * (15.0 / teladevy)) * 0.5,
-                                             maxstdx * 0.5 - (maxstdx * (30.0 / teladevx)) * 0.5,
-                                             "||~~OOOO",
-                                             "Operação bem sucedida",
-                                             "Produto removido com sucesso");
-                                     }
-                                     // 3) Falhou por outro motivo
-                                     else
-                                     {
-                                         gerarAviso(
-                                             maxstdy * (15.0 / teladevy),
-                                             maxstdx * (30.0 / teladevx),
-                                             maxstdy * 0.5 - (maxstdy * (15.0 / teladevy)) * 0.5,
-                                             maxstdx * 0.5 - (maxstdx * (30.0 / teladevx)) * 0.5,
-                                             "||~~OOOO",
-                                             "Erro",
-                                             "Falha ao remover o produto");
-                                     }
-                                 }
+
+                         keypad(stdscr, TRUE);
+                         Produto *sel = selecionarProduto(&LProdutos);
+
+                         clear();
+                         refresh();
+
+                         if (sel)
+                         {
+                             
+                             unsigned short h = 15;   
+                             unsigned short w = 40;  
+                        
+                             
+                             unsigned short yi = (maxstdy - h) / 2;
+                             unsigned short xi = (maxstdx - w) / 2;
+                        
+                             // 1) Verifica se produto está em algum pedido
+                             if (produtoEstaEmUmPedido(&LPedidos, sel->id))
+                             {
+                                 gerarAviso(
+                                     h, w, yi, xi,
+                                     "||~~OOOO",
+                                     "Produto não pode ser removido",
+                                     "Este produto está vinculado a um pedido!"
+                                 );
+                             }
+                             // 2) Pode remover normalmente
+                             else if (removerProduto(&LProdutos, sel->id))
+                             {
+                                 gerarAviso(
+                                     h, w, yi, xi,
+                                     "||~~OOOO",
+                                     "Operação bem sucedida",
+                                     "Produto removido com sucesso"
+                                 );
+                             }
+                             // 3) Falhou por outro motivo
+                             else
+                             {
+                                 gerarAviso(
+                                     h, w, yi, xi,
+                                     "||~~OOOO",
+                                     "Erro",
+                                     "Falha ao remover o produto"
+                                 );
+                             }
+                         }
 
                   }
                   break;
@@ -334,6 +333,7 @@ int main()
                   case REMOVER_PEDIDO:
                   {
 
+                     removerPedidoComInterface(&LPedidos);
                   }
                   break;
                   case VOLTAR_PEDIDO:
